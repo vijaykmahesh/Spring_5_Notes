@@ -1,0 +1,284 @@
+
+	
+	@RequestParam: to bind query parameters value.
+	
+	For less fields we can bind data using @RequestParam but for more fields we can't use @RequestParam since we have to write more repeated code
+	so we go with the approach of DTO.
+	
+	First define a class and in that class mention properties which are required.
+	Spring will automatically bind the formData to DTO i,e (Properties Name of Class and FormData should be same)
+	
+
+	Spring-MVC form tag:
+	-------------------------
+	To activate MVC form tag use below in JSP.
+	
+	For Achieving Two-Way Data Binding i,e (Writting the Values to ObjectProperty By fetching it from URL) and (Read the existing ObjectProperties values by fetching from DTO) we can use
+	Spring-MVC form tag.
+	
+	
+	
+	<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>  ----> to activate mvc form tag
+	
+	
+	<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+		pageEncoding="ISO-8859-1"%>
+	<!DOCTYPE html>
+	<html>
+	<head>
+	<meta charset="ISO-8859-1">
+	<title>homepage</title>
+	</head>
+	<body>
+
+		<h1 align="center">Love Calculator</h1>
+
+		<form:form action="process-homepage" method="get" modelAttribute="userInfo">
+
+			<div align="center">
+				<p>
+					<label for="yn">Your Name :</label> <form:input type="text" id="yn"
+						path="userName"/>
+				</p>
+
+				<p>
+					<label for="cn">Crush Name :</label> <form:input type="text" id="cn"
+						path="crushName"/>
+				</p>
+
+				<input type="submit" value="calculate">
+			</div>
+		</form:form>
+	</body>
+	</html>
+	
+	
+	<form:input type="text" id="yn" path="userName"/> ---> path --> what it does means it fetches userName from userInfo.getUserName() and stores inside path
+	
+	LcAppController:
+	------------------
+	
+	//1st Approach
+	
+	@RequestMapping("/")
+	public String showHomePage(Model model) {
+		
+		//reading existing property by fetching it from DTO
+		UserInfoDTO userInfoDTO = new UserInfoDTO();
+		model.addAttribute("userInfo", userInfoDTO);
+		
+
+		return "home-page";
+	}
+	
+	2nd Approach
+	---------------
+	@RequestMapping("/")
+	public String showHomePage(@ModelAttribute("userInfo") UserInfoDTO userInfoDTO) {
+
+		return "home-page";
+	}
+	
+	@ModelAttribute("userInfo") --> It does same operation as Model model;
+	
+	
+	
+	@ModelAttribute at the method level:
+	---------------------------------------
+	
+	Whenever we use @ModelAttribute at the method level that method will be executed irrespective of requestMapping we fire.
+	
+	Whenever we use @ModelAttribute at the method level object will be binded to Model.
+	
+	Post-completion of that method corresponding requestMapping will be executed.
+	
+	
+	For Example:
+	---------------
+	
+	@ModelAttribute("websiteInfoDTO")
+	public WebsiteInfoDTO getWebsiteInfoDTO() {
+		
+		System.out.println("@ModelAttribute : inside getWebsiteInfoDTO");
+		
+		WebsiteInfoDTO websiteInfoDTO = new WebsiteInfoDTO();
+		
+		websiteInfoDTO.setWebsiteName("seleniumm express");
+		websiteInfoDTO.setWebsiteCategory("education");
+		
+		return websiteInfoDTO;
+		
+	}
+
+	@RequestMapping("/showWebsiteInfo")
+	public String showWebsiteInfo(Model model) {
+		
+		System.out.println("@ModelAttribute : inside showWebsiteInfo");
+		
+		//The object which is created and return from getWebsiteInfoDTO() can be accessed
+		
+			WebsiteInfoDTO websiteInfoDto = (WebsiteInfoDTO)model.getAttribute("websiteInfoDTO");
+		
+		System.out.println("WebsiteInfoDTO inside showWebsiteInfo" +websiteInfoDto.getWebsiteCategory());
+		
+		return "test";
+	}
+	
+	@RequestMapping("/showCompanyInfo")
+	public String showCompanyInfo(Model model) {
+		
+		System.out.println("@ModelAttribute : inside showCompanyInfo");
+
+		//The object which is created and return from getWebsiteInfoDTO() can be accessed
+		
+		WebsiteInfoDTO websiteInfoDto = (WebsiteInfoDTO)model.getAttribute("websiteInfoDTO");
+		
+		System.out.println("WebsiteInfoDTO inside showCompanyInfo" +websiteInfoDto.getWebsiteName());
+		
+		return "test";
+	}
+	
+	WebsiteInfoDTO Object will be avaliable for showWebsiteInfo mapping and showCompanyInfo mapping also
+	-------------------------------------------------------------------------------------------------------
+	
+	How to make ModelAttribute avaliable in Different Controllers?
+	------------------------------------------------------------------
+	
+	Once we annotate class with @ControllerAdvice ModelAttribute will be avaliable for all controllers.
+	
+	when we annotate class with @ControllerAdvice it will also avaliable for ComponentScanning i,e 
+	That corresponding class object will be created.
+	
+	Example:
+	-----------
+	
+	DemoController
+	--------------------
+	
+	
+	@Controller
+	@ControllerAdvice
+	public class DemoController {
+		
+		@ModelAttribute("websiteInfoDto")
+		public WebsiteInfoDTO getWebsiteInfoDTO() {
+			
+			System.out.println("@ModelAttribute : inside getWebsiteInfoDTO");
+			
+			WebsiteInfoDTO websiteInfoDTO = new WebsiteInfoDTO();
+			
+			websiteInfoDTO.setWebsiteName("seleniumm express");
+			websiteInfoDTO.setWebsiteCategory("education");
+			
+			return websiteInfoDTO;
+			
+		}
+		
+		@RequestMapping("/showCompanyInfo")
+		public String showCompanyInfo(Model model) {
+			
+			System.out.println("@ModelAttribute : inside showCompanyInfo");
+			
+			//The object which is created and return from getWebsiteInfoDTO() can be accessed
+			
+			WebsiteInfoDTO websiteInfoDto = (WebsiteInfoDTO)model.getAttribute("websiteInfoDTO");
+			
+			System.out.println("WebsiteInfoDTO inside showCompanyInfo" +websiteInfoDto.getWebsiteName());
+
+			return "test";
+		}
+		
+		
+		}
+		
+		
+		
+	TestController:
+	-----------------
+	
+	public class TestController {
+	
+	@RequestMapping("/showWebsiteInfo")
+	public String showWebsiteInfo(Model model) {
+		
+		System.out.println("@ModelAttribute : inside showWebsiteInfo");
+		
+		//The object which is created and return from getWebsiteInfoDTO() can be accessed
+		
+		WebsiteInfoDTO websiteInfoDto = (WebsiteInfoDTO)model.getAttribute("websiteInfoDTO");
+		
+		System.out.println("WebsiteInfoDTO inside showWebsiteInfo" +websiteInfoDto.getWebsiteCategory());
+
+		return "test";
+	}
+	
+
+	}
+
+	Now websiteInfoDto is avaliable for TestController since we have annotated with @ControllerAdvice in DemoController.
+	
+	What if we want to make ModelAttribute avaliable for specific controller?
+	--------------------------------------------------------------------------
+	@ControllerAdvice(assignableTypes = TestController.class) --> at class level 
+	
+	Now ModelAttribute will be avaliable only for TestController.
+	
+	For spcific packages?
+	------------------------
+	@ControllerAdvice(basePackages = {"com.express.service"})
+	
+	
+	When to use @ModelAttribute ?
+	-------------------------------
+	Whenever we want share common data.
+	
+
+	ModelAttribute will not survive the redirect i,e whenever we hit (/hello) name will be added to model and it will 
+	be redirected to realHello.In the realHello() modelAttribute value won't be avaliable.
+	
+	@RequestMapping("/hello")
+	public String hello(Model model) {
+		
+		model.addAttribute("name","nayak");
+		
+		return "redirect:/realHello";
+	}
+	
+	@RequestMapping("/realHello")
+	public String realHello(Model model) {
+		
+		// Here model attribute value won't be avaliable.
+		
+		return "welcome";
+	}
+	
+	Inorder to make it avaliable we can use sessionattribute or RedirectAttribute i,e 
+	
+	@RequestMapping("/hello")
+	public String hello(Model model, RedirectAttribute redirectAttribute) {
+		
+		redirectAttribute.addFlashAttribute("name","nayak");
+		
+		return "redirect:/realHello";
+	}
+	
+	@RequestMapping("/realHello")
+	public String realHello(Model model) {
+		
+		// Here Flashattribute value will be avaliable.
+		
+		return "welcome";
+	}
+	
+	The problem with Flashattribute is once it has been rendered once then after that value will be removed from model.
+	i,e if we do refresh again (/realHello) we won't able to get any value from ModelAttribute.
+	
+	If we want to have the value permanently then use sessionattribute.
+	
+	
+	
+	
+	
+	
+	
+		

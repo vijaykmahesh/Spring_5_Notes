@@ -1,0 +1,53 @@
+	
+		
+		Make sure to install Eclipse Java EE Developer Tools in sts before working with Spring MVC application.
+		
+		
+		For Spring 3 Version use below configuration
+		---------------------------------------------
+		Java 1.8  
+		Tomcat 9
+		Use Javax.servlet maven dependency.
+
+
+		For Spring 6 Version use below configuration
+		-----------------------------------------------
+		Java 17 and above 
+		Tomcat 10
+		Use Jakarta 
+		Mysql connector --> 8.0 
+		
+		change web.xml file --> 5.0 i,e 
+		----------------------------------
+		<web-app
+        xmlns = "https://jakarta.ee/xml/ns/jakartaee"
+        xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation = "https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"
+        version = "5.0"
+        metadata-complete = "false">
+		</web-app>
+
+		Use Jakarta.servlet maven dependency 
+		In Project-Facets set Dynamic web module --> 5.0 by going to 
+		root directory of settings folder of org.eclipse.wst.common.project.facet.core file
+		
+		Changing Java Version and Maven Compiler version
+		----------------------------------------------------
+		
+		1) Inside pom.xml file change to below code:
+		 
+		 <properties>
+		<maven.compiler.source>19</maven.compiler.source>
+		<maven.compiler.target>19</maven.compiler.target>
+		</properties>
+		
+		2) Or Right click on project --> properties --> build path --> JRE --> Edit.
+		
+		Add Lombok to project
+		-------------------------
+		1) Add lombok to pom.xml file.
+		2) go to c:/users/user-name/.m2/repository/org.projectlombok/lombok/1.18.26(version)/
+			click on lombok-1.18.26.jar
+		3) window will open 
+			click on specify location --> give sts location i,e sts.exe 
+		4) Lombok will be installed then close sts and rebuild project.

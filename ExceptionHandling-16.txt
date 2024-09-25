@@ -1,0 +1,78 @@
+	@ExceptionHandler:
+	---------------------
+	Whenever we want to handle exception we will be annotating with @ExceptionHandler.
+	
+	Example:
+	-----------
+	public class TestController {
+	
+	Info serverInfo;
+	
+	@RequestMapping("/showWebsiteInfo")
+	public String showWebsiteInfo(Model model) {
+		
+		System.out.println("@ModelAttribute : inside showWebsiteInfo");
+		
+		//The object which is created and return from getWebsiteInfoDTO() can be accessed
+		
+		WebsiteInfoDTO websiteInfoDto = (WebsiteInfoDTO)model.getAttribute("websiteInfoDTO");
+		
+		System.out.println("WebsiteInfoDTO inside showWebsiteInfo" +websiteInfoDto.getWebsiteCategory());
+		
+		1) System.out.println("Ip address of server is" +serverInfo.getServerIp());
+
+		return "test";
+	}
+	
+	@ExceptionHandler(value = NullPointerException.class)
+	public String handleNullPointException(){
+		
+		return "nullpointerexception";
+	}
+	
+
+}
+
+	Now when we call /showWebsiteInfo mapping from browser we will be getting NullPointerException at line No 1) because Info Object is not created,
+	In order to handle this type of exception i,e 
+	
+	we will using @ExceptionHandler annotation on top of method.
+
+	In this above example what happens is 
+	
+	whenever line no 1) is executed the Spring will take control from line no 1) to to execute handleNullPointException() since it is annotated with @ExceptionHandler.
+	Like this way we can handle exception in Spring MVC.
+	
+	
+	Global Exception Handler:
+	------------------------------
+	
+	Whenever we get exception in any controller Global Exception Handler will be used.
+	
+	If i want Exception to be visible to all controllers annotate class with @ControllerAdvice.
+	
+	once we annotate any class with @ControllerAdvice it will be avalible for all.
+	
+	Example:
+	-----------
+	
+	@ControllerAdvice
+	public class GlobalExceptionHandler {
+
+		@ExceptionHandler(value = NullPointerException.class)
+		public String handleNullPointException() {
+
+			return "nullpointerexception";
+		}
+
+		@ExceptionHandler(value = Exception.class)
+		public String handleException() {
+
+			return "exception";
+		}
+
+	}
+
+ 	
+	
+	

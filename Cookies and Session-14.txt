@@ -1,0 +1,219 @@
+
+In our example:
+---------------------
+Once we click on submit button of love calculator after filling userName and crushName,
+It is new request for server, server process a request and gives us a response.
+
+	HTTP Protocol:
+	-----------------
+	Each request will be new request since it is Http request i,e it is a stateless protocol
+	Once request is sent tp server then server process the request and gets response to user.
+	
+	After this both request and response gets destroyed.
+	
+	Next Tym if we connect to server then it will be new request i,e server doesn't know who am i. 
+
+Once response is given to us by server our model object is destroyed completely so we can't fetch to next page
+
+Then how can we track the object in our case (userName) to next page:
+------------------------------------------------------------------------
+
+	1) by sending the data through URL. i,e 
+		
+		<a href="/spring-love-calculator/sendEmail/?userName=${userInfo.userName}">Send Result To Your Email</a> 
+		
+		now URL is --> /spring-love-calculator/sendEmail/?userName=vijay
+		
+		
+	2) by sending the data through URL. i,e <a href="/spring-love-calculator/sendEmail/${userInfo.userName}">Send Result To Your Email</a> 
+	
+		now URL is --> /spring-love-calculator/sendEmail/vijay
+
+		In controller @RequestMapping will be --> @RequestMapping("/sendEmail/{userName}")
+		
+		we can accept by using @PathVariable("userName") and we will attach this value to model Object.
+		
+		
+	  Wat if we have more than 3 values sending by user then we should attach it to path variable and access, their will be redundecy in code i,e
+	  
+	  For example:/spring-love-calculator/sendEmail/vijay/jobbj/youtube
+	  
+	  Another problem is what if we send the same link to another user he can open browser and access that link easily.
+	  
+	  sendEmail page can be accessed only if that user is using the application from beginning i,e If new user directly comes to access this page it will be issue.
+	  
+	  
+	  
+	Then How can i send data ?
+	------------------------------
+	From all pages i should be able to access the data means i should be using concept called Session and Cookies.
+	
+	Cookies are helpful to tarck user data.
+	
+	Since HTTP is stateless protocol then how Cookies helps us to track user data?
+	-------------------------------------------------------------------------------
+	
+	Taking Example of Amazon website:
+	-----------------------------------
+	
+	amazon/addToCart --> i,e once we add item to cart request will go to amazon server it process request and generates HTML or some page, 
+	and also whatever item we are trying to add to our cart it will create a cookie.
+	
+	Cookie is text file and in this text file contains the amazon server writes all info to this file saying the user is trying to add item to cart.
+	and sends response to user with cookie attached with it.
+	
+	once response is received from server cookies is stores in client computer.
+	
+	Next, when we close browser and re-poen later and again once hit url --> amazon/addToCart,then request will go to server with cookie as well, then 
+	server will check whether it is first or second request 
+	
+	How? will it come to know i,e by reading a cookie which will say user has tried to add some item to cart.
+	then server it will generate HTML page by reading a cookie.
+	
+	In chrome to see cookie 
+	---------------------------
+	click on three dtos in chrome browser --> more tools --> developer tools --> application --> left side u can find cookies tab.
+	
+	Cookie will be avaliable in browser till the expiry time we have given, even though we close broswer also.
+	
+	In each and every controller we need to access cookie means then it will be redundecy of code in every controller 
+	so, Spring has given annotation to avoid code redundecy.
+	
+	we can use @CookieValue annotation.
+	
+	User can block cookies also so that we can't store in our system.
+	
+	
+	Disadvantages of Cookie:
+	------------------------------
+	
+	1) User can block cookies also so that we can't store in our system.
+	
+	2) If information is huge then its difficult to read and write cookie, For Example in Amazon.
+	
+	3) Cookie has a storage dependency i,e it can store or send more then 4KB i,e we always have a limit.
+	
+	
+	To over this disadvantage we will be using Sessions:
+	--------------------------------------------------------
+	
+	amazon/addToCart --> i,e once we add item to cart request will go to amazon server it process request and generates HTML or some page, 
+	and stores the userInfo in serverMemory(In-Memory) by specifying id for user.
+	
+	The id which is generated will only be stored in cookie but not all the userInformation.
+	
+	Their is no constraint in the memory since inside cookie we are storing only id not entire userInfo.
+	
+	* Cookie will be stored in client computers.
+	
+	* Session Belongs to server. 
+	
+	
+	Once we add session it will be avaliable to all pages.
+	
+	1) HttpSession session =  request.getSession(); 
+	2) session.setAttribute("userName", userInfoDTO.getUserName());
+	
+	Line No 1 code will do below operations and Details abt Session:
+	-----------------------------------------------------------------
+	
+	 It is going to run whole process i,e Creating cookie and adding the cookie to response.
+	
+	 It will run complete process of creating cookie and managing cookie.
+	 
+	 What we are saying is 
+	 
+		If we are new user then create new session and if their is already session exist then give me that session i,e 
+	
+		If already cookie exist get me that cookie or else if it is new user then create cookie and give me. 
+	
+	 By default Session Objects are stored inside Server Memory, All the objects will be removed from Server Memory once we stop server.
+	 
+	 Session can we seen once we open broswer and type ctrl+shift+c in Application Tab.
+	 
+	 JSESSIONID and Value is Id given for that user.
+	 
+	 Only Add the data to session whenever we are in need only.
+	 
+	 If we want to do some operation on session we can do it by this way:
+	 ---------------------------------------------------------------------
+	 
+		String userName = session.getAttribute("");
+		String newUserName = "Mr" + userName;
+		model.addAttribute("userName",newUserName);
+	
+	How long Session will be valid?
+	-----------------------------------
+		
+		Example: Amazon website
+		
+		If we don't visit website at all once more then what will happen will the session be their all time ?
+		
+		we can expire the session in web.xml i,e by 
+		
+		<session-config>
+		<session-timeout>20</session-timeout>
+		</session-config>
+
+		or by 
+		
+		session.setMaxInactiveInterval(120); // 120 minutes only it will be valid after that session will be destroyed.
+		
+		
+
+	Another way to use session is by annotation @SessionAttributes:
+	--------------------------------------------------------------------
+	
+	@SessionAttributes("userInfo") ---> which will take only model objects.
+	
+	@SessionAttributes should be added at class level of controller.
+	
+	@SessionAttributes does the same operations as Http Session does.
+	
+	Since it internally uses HttpSession u can configure saying we should save it into Database for example we can do that also.
+	
+	Make sure that ModelAttribute name and SessionAttributes Name should be same then only model object will be stored inside server memory.
+	
+	If ModelAttribute name and @SessionAttributes name is not same we will be getting exception called HttpSessionRequiredException.
+	
+	whenever we have @ModelAttribute @SessionAttributes will not work ?
+	---------------------------------------------------------------------
+		@ModelAttribute("userInfo") UserInfoDTO userInfoDTO -----> means I am going to store ModelAttribute object inside session but we have to make sure that we should create Model manually.
+		
+		to work with @SessionAttributes.
+		
+		i,e
+		
+	@RequestMapping("/")
+	public String showHomePage(Model model) {
+
+		// Read the existing property values by fetching from DTO.
+
+		// Check whether user had already visited the website if yes attach cookie and
+		// send
+//		Cookie[] cookies = request.getCookies();
+//		for (Cookie temp : cookies) {
+//
+//			if ("lcApp.userName".equals(temp.getName())) {
+//
+//				String myUserName = temp.getValue();
+//				userInfoDTO.setUserName(myUserName);
+//			}
+//
+//		}
+		model.addAttribute("userInfo", new UserInfoDTO());
+		return "home-page";
+	}
+			
+	
+	If we want to store 2 or more model objects we can use by this way --> @SessionAttributes({"userInfo","test"})
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

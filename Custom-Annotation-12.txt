@@ -1,0 +1,161 @@
+
+	In order to develop our own custom annotation we must follow some steps:
+	-----------------------------------------------------------------------
+	
+	For Ex: private int age;
+	
+	For above variable we have create own annotation say @AgeValidator
+	
+	1) @interface AgeValidator {
+		
+		
+	
+	}
+	
+				@AgeValidator(lower = 30 , upper = 40 ,
+				message = "age must be within 30-40")
+	2nd-case)   private int age;
+	
+				@interface AgeValidator {
+				
+				int lower() 
+				
+				int upper()
+				
+				String message()
+			
+			}
+	
+	3rd case)     private int age;
+	
+				@interface AgeValidator {
+				
+				int lower() default 18;
+				
+				int upper() default 60;
+				
+				String message() default
+				"age must be between 16-60";
+				
+				Class<?>[] groups() default {};
+
+				Class<? extends Payload>[] payload() default {};
+			
+			}
+			
+			
+		upon annotation i,e before @Interface AgeValidator we must declare annotation called @RETENTION(RUNTIME)
+		
+		y we have write @RETENTION(RUNTIME) ?
+		----------------------------------------
+		Till Wat point our annotation will be retained (work).
+		
+		RUNTIME --> it is nothing but retention policy.
+		
+		Suppose we have requiremtnt saying if age is 35+ then he has BP how to validate ?
+		-------------------------------------------------------------------------------------
+		If we want to write logic for annotation we must declare another class that implements 
+		ConstraintValidator<annotationName,Type>.
+		
+		
+		Example : AgeValidator
+		-------------------------
+		Spring automatically detects AgeValidator class since it implements ConstraintValidator.
+		
+		inside AgeValidator write below code:
+		------------------------------------------
+		
+		public class AgeValidator implements ConstraintValidator<Age, Integer> {
+
+	private int lower;
+
+	private int upper;
+
+	public void initialize(Age age) {
+
+		// i can write post construct work right here i,e we will do intialization part
+		// here
+		// to capture default value entered in annotation
+		//only once this method will be executed 2nd tym directly isValid() will be executed since intialization is already done.
+		
+		System.out.println("initialize method of custom age validator");
+		
+		this.lower = age.lower();
+		this.upper = age.upper();
+
+	}
+
+
+	@Override
+	public boolean isValid(Integer age, ConstraintValidatorContext context) {
+		// TODO Auto-generated method stub
+
+		// write logic here
+		// values entered by user in form should be taken.
+		
+		System.out.println("isValid method of custom age validator");
+
+		if (age == null) {
+			return false;
+		}
+
+		if (age < lower || age > upper) {
+			return false;// fail
+		} else
+
+			return true;// pass
+	}
+
+}
+		If we want to overide messages for example:
+		----------------------------------------------
+		
+		String message() default
+				"age must be between {lower}-{upper}";
+		
+		Here now lower and upper values are dynamic.
+		
+		How to provide custom messages:
+		-----------------------------------
+		String message() default
+				"{invalidAgeMessage}";
+				
+		Now invalidAgeMessage value will be fetched from properties file i,e.
+		
+		
+		To load the properties file we will use ResourceBundleMessageSource.
+		
+		Hey Spring for Validation purpose please look for messageSource and messageSource is having messages.properties file 
+		
+		we are specifying it by creating LocalValidatorFactoryBean object.
+		-----------------------------------------------------------------------
+		
+		write below code inside configuration class:
+		-------------------------------------------------
+		
+		@Bean
+		public MessageSource messageSource(){
+			
+			ResourceBundleMessageSource messageSource = new ResourceBundleMessageSource();
+			messageSource.setBasename("messages"); // load messages.properties file
+			
+			return messageSource;
+		}
+	
+		@Bean
+		public LocalValidatorFactoryBean validator(){
+			
+			//Hey Spring for Validation purpose please look for messageSource and messageSource is having messages.properties file 
+			
+			LocalValidatorFactoryBean localValidatorFactoryBean = new LocalValidatorFactoryBean();
+			localValidatorFactoryBean.setValidationMessageSource(messageSource());
+			
+			return localValidatorFactoryBean;
+		}
+		
+		@Override
+	public Validator getValidator() {
+		
+		return validator();
+	}
+		

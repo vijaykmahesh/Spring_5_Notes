@@ -1,0 +1,50 @@
+	
+	1) Turn on the 2- step verification from google account
+	2) Define a bean
+		
+		@Bean
+		public JavaMailSender configureMailSener() {
+
+		JavaMailSenderImpl javaMailSenderImpl = new JavaMailSenderImpl();
+		javaMailSenderImpl.setHost("smtp.gmail.com");
+		javaMailSenderImpl.setPort(587);
+		javaMailSenderImpl.setUsername("vijik2547@gmail.com");
+		
+	//below property value is fetched from creating App password from google account
+		javaMailSenderImpl.setPassword("nkjixvzkfpzsvjlj"); 
+		
+		Properties mailProperties = new Properties();
+		
+		mailProperties.put("mail.smtp.starttls.enable", true);
+		mailProperties.put("mail.smtp.ssl.trust", "smtp.gmail.com");
+		mailProperties.put("mail.smtp.ssl.enable", true);
+		mailProperties.put("mail.smtp.auth", true);
+		mailProperties.put("mail.smtp.socketFactory.port", "465");
+		mailProperties.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+		mailProperties.put("spring.mail.properties.mail.smtp.connectiontimeout","5000");
+		mailProperties.put("spring.mail.properties.mail.smtp.timeout","5000");
+		mailProperties.put("spring.mail.properties.mail.smtp.writetimeout","5000");
+
+		javaMailSenderImpl.setJavaMailProperties(mailProperties);
+
+		return javaMailSenderImpl;
+
+	}
+	
+	3) 
+		@GetMapping("/sendEmail")
+		public String sendEmail() {
+			
+			SimpleMailMessage email = new SimpleMailMessage();
+			
+			email.setTo("vijik2547@gmail.com");
+			email.setSubject("Request Subject");
+			email.setText("Hi welcome to coding");
+			
+			emailSenderImpl.send(email);
+
+			return "instructor-home";
+		}
+
+	
+	

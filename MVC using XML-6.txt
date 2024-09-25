@@ -1,0 +1,283 @@
+FrontController:
+----------------
+It just accepts the request from client , routes the request to specific controller, receives the response from controller and sends back to client.
+
+we don't need to create Front controller its already created by spring which is know as DispatcherServlet.
+
+We need to use it how to use by defining it in a web.xml file inside servlet tag.
+
+We can have multiple DispatcherServlet but all DispatcherServlet will have its own WebApplicationContext 
+
+DispatcherServlet should be configured in web.xml file.
+
+	what is web.xml?
+	-------------------
+	web.xml is DeploymentDiscriptor.
+	
+	DeploymentDiscriptor is a configuration file for our web-app i,e all the configuration we want to in web-app will be done in web.xml.
+	
+	web.xml will be automatically picked up by the tomcat server.
+	
+	tomcat server uses these information to serve a web request.
+	
+	when a tomcat server receives web request, it uses web.xml url mapping to send the request to specific controller which can handle the request i,e
+	
+	 <url-pattern>/home.com/*</url-pattern>
+	 
+	What kind of configuration can be done in web.xml ?
+	--------------------------------------------------------
+	a) Url mapping.
+	b) Filters
+	c) Security i,e we can authenticate any request which is coming i,e the request coming from client is valid.
+	d) Error Handlers i,e imagine a request in coming to server and fails to process that request and giving Internal Server Error and this error shouldn't be shown to end-user.
+	so we have to handle it using error handlers i,e by creating seperate page saying our server is down please come back later.
+	e) Welcome-file list i,e It helps us to configure our landing page for our WebApplication.
+
+	Can we deploy WebApplication without web.xml file ?
+	-------------------------------------------------------
+	Yes we can deploy and run but from servlet 3.0
+	
+	
+
+i,e in web.xml file put below code:
+-----------------------------------------
+
+<absolute-ordering/>
+  
+  <servlet>
+  <servlet-name>dad-frontcontroller</servlet-name>
+  <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+  <load-on-startup>1</load-on-startup>
+  </servlet>
+  
+  <servlet-mapping>
+  <servlet-name>dad-frontcontroller</servlet-name>
+  <url-pattern>/home.com/*</url-pattern>
+  </servlet-mapping>
+</web-app>
+
+load-on-startup is used for when we start tomcat server DispatcherServlet should intialized at that tym only.
+url-pattern is used when client sends any request it must first start with /home.com/*.
+
+create springConfig file called dad-frontcontroller-servlet.xml under ClassPath i,e (src/main.webapp-WEB-INF)
+
+
+When Dispatcher Servlet Object will be created?
+----------------------------------------------------
+It will be intialized when we deploy project in tomcat server i,e when we start a tomcat server.
+
+
+@Controller--> 
+	a) it specifies spring that i am a controller class.
+	b) Spring will automatically intialize the class and register tat class in IOC container.
+	
+@ResponseBody-->
+	a) It basically writes response into Http Response.
+	   Basically DispatcherServlet looks for @ResponseBody at method level of controller if it doesn't find it, then thinks it as a JSP file and looks for JSP file so 
+	   only we should specify @ResponseBody if we r written string as response.
+
+	
+
+What happens when DispatcherServlet is intialized? taking above example
+---------------------------------------------------------------------------
+	Once we put our project inside tomcat server DispatcherServlet is intialiazed.
+	
+	Tomcat (WebServer) will automatically detect web.xml file and reads a file and then intializes a DispatcherServlet from it.
+	
+a) whenever DispatcherServlet is intialized next DispatcherServlet needs a configuration file (WebApplicationContext) i,e will look for file called dad-frontcontroller-servlet.xml(SpringConfigurationFile) 
+	under WEB-INF directory, if it doesn't find then, it throws exception called FileNotFoundException.
+	
+b) Once it finds dad-frontcontroller-servlet.xml DispatcherServlet creates a container out of that file i,e WebApplicationContextContainer since it is WebApplication.
+   We don't need to create container it is created during server startup and destroyed automatically when we stop the server.
+   
+c) DispatcherServlet goes through -servlet.xml then it finds 
+			For Example:
+			 <context:component-scan base-package="com.home.controller"></context:component-scan>
+			 
+	WebApplicationContext has advance features than ApplicationContext i,e (WebApplicationContext extends ApplicationContext)
+			 
+    Then it knows it should do component scan i,e developer as written annotation like @controller or by using @component
+	After that it goes to that specific package (com.home.controller) it finds all classes under this package and looks for annotation called @component or @controller
+	If it finds it directly creates object of that controller and stored inside WebApplicationContextContainer i,e all controllers are registered with WebApplicationContext(container).
+	
+d)  From web-browser if we give url 
+		For Example: /home.com/sugar
+		
+		First it comes to DispatcherServlet i,e in web.xml we have given url-pattern it looks for specific url pattern and matches with that url-pattern.
+		then it handles request, once it handles this request it looks for url-pattern /sugar , now DispatcherServlet tries to resolve that url-pattern request.
+		
+		i,e since all controllers are registered in WebApplicationContext(container), now DispatcherServlet will scan all controllers and in each controller we have 
+		specified @RequestMapping() annotation. 
+		
+		DispatcherServlet will try to match that url pattern with controller if it finds then it executes particular method from controller and provides the response to end-user. 
+		
+		
+What if we change fileName of -server.xml file can we have different name as that of declared in web.xml?
+---------------------------------------------------------------------------------------------------------------
+
+Yes we can do, first create new xml file 
+	For Example:
+		dad-frontcontroller-dispatcher-servlet.xml
+		
+		Then in web.xml file write below code inside servlet tag
+			
+			<init-param>
+				<param-name>contextConfigLocation</param-name>
+				<param-value>/WEB-INF/dad-frontcontroller-dispatcher-servlet.xml</param-value>
+			</init-param>
+			
+			
+Inside controller class write below code:
+--------------------------------------------
+@Controller
+public class MomController {
+	
+	@ResponseBody
+	@RequestMapping("/sugar")
+	public String giveSugar() {
+		
+		return "cricket";
+	}
+
+}
+
+			
+			
+How to return .html or .jsp or any other extension type so that client can view a page?
+------------------------------------------------------------------------------------------
+
+create a extension file first 
+	For Example: cricket.jsp
+	
+	<!DOCTYPE html>
+	<html>
+	<head>
+	<meta charset="ISO-8859-1">
+	<title>Insert title here</title>
+	</head>
+	<body bgcolor="pink">
+
+	<h1>MRF Cricket</h1>
+
+	</body>
+	</html>
+	
+In controller Class we have written below code:
+--------------------------------------------------
+
+	package com.home.controller;
+
+	import org.springframework.stereotype.Controller;
+	import org.springframework.web.bind.annotation.RequestMapping;
+
+	@Controller
+	public class MomController {
+	
+	@RequestMapping("/sugar")
+	public String giveSugar() {
+		
+		return "/WEB-INF/view/cricket.jsp";
+	}
+
+  }
+  
+In above code we are giving fullyQualifiedPath for .jsp file its bad practice and we should not provide extension also, so to resolve this 
+their is another concept called View Resolver.
+
+	View Resolver:
+	----------------
+	
+	Spring Has already provide resolver know as InternalResoureViewResolver, we have to use it thats it.
+
+	First Configure View Resolver in springConfiguration file i,e dad-frontcontroller-dispatcher-servlet.xml
+	
+	write below code
+	------------------
+	
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/view/"></property>
+		<property name="suffix" value=".jsp"></property>
+	</bean>
+	
+	In controller class write below code:
+	----------------------------------------
+	@Controller
+	public class MomController {
+	
+	@RequestMapping("/sugar")
+	public String giveSugar() {
+		
+		return "cricket";
+	}
+
+   }
+   
+   After client makes request for /sugar it comes to specific controller that specific controller method returns pageName, once it returns pageName DispatcherServlet gives
+   pageName to ViewResolver then ViewResolver adds prefix and suffix to existing pageName and give to DispatcherServlet by providing fullyQualifiedPath.
+   Once DispatcherServlet comes to know abt path it returns that page to Client.
+   
+    Model Object: (Model is an interface)
+	----------------------------------------
+	If we want to send data to view we must bind the data in Model.
+	we can store data in the form of key and value pair.
+	
+	In controller class 
+	----------------------
+	@Controller
+	public class CafeController {
+	
+	@RequestMapping("/cafe")
+	public String showWelcomePage(Model model) {
+		
+		String name = "Vijay";
+		
+		model.addAttribute("myNameValue", name);
+		
+		return "welcome-page";
+	}
+
+  }
+  
+  welcome-page.jsp
+  ------------------
+  
+	<!DOCTYPE html>
+	<html>
+	<head>
+	<meta charset="ISO-8859-1">
+	<title>Insert title here</title>
+	</head>
+	<body>
+		<h1 align="center">Mom's Cafe</h1>
+		<hr>
+		My Name is : ${myNameValue}
+
+	</body>
+	</html>
+	
+   By default if we want load any page at startup we want to add it in below way:
+----------------------------------------------------------------------------------------
+
+	 <welcome-file-list>   
+    <welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+	
+	Now whenever server starts it loads index.jsp file to end-user.
+	
+	Make sure that create file under webapp by right-clicking.
+	
+	
+	
+	
+   
+   
+
+
+			
+			
+			
+
+
+
+

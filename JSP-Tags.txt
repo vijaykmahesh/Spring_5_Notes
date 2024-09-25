@@ -1,0 +1,21 @@
+
+	Drop-down List:
+	-------------------
+	<form:select path="instructor.instructor_id">
+		
+		<form:options items="${instructorList}" itemLabel="instructor_name" itemValue="instructor_id"/>
+		
+		</form:select>
+		
+		
+	itemLabel:
+	-----------
+	It is attribute used for showing value in dropdown list.
+	
+	itemValue:
+	--------------
+	this value is saved in database.
+	
+	items="${instructorList}":
+	------------------------------
+	List of instructors will be looped.

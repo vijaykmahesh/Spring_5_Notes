@@ -1,0 +1,46 @@
+
+	2nd approach for DispatcherServlet:
+	--------------------------------------
+	
+	Spring is taking control and creating the DispatcherServlet Object for us.
+	
+	The way AbstractAnnotationConfigDispatcherServletInitializer is working is same as LoveCalculatorApplicationIntializer (configured DS in 1st way)
+	
+	Since the class is not implementing WebApplicationInitializer then how does tomcat detech this class?
+	----------------------------------------------------------------------------------------------------
+	
+	LcAppIntializer extends --> 
+	
+			AbstractAnnotationConfigDispatcherServletInitializer extends -->
+			
+												AbstractDispatcherServletInitializer extends --> AbstractContextLoaderInitializer implements --> WebApplicationInitializer
+	
+	AbstractDispatcherServletInitializer class is responsible for creating and intializing DispatcherServlet.
+	
+	inside AbstractDispatcherServletInitializer class their is property called DEFAULT_SERVLET_NAME = "dispatcher" i,e dispatcher is default name for DispatcherServlet.
+	
+	AbstractDispatcherServletInitializer has a onStartup(). 
+	
+	1st approach also we have overiden onStartup() only.
+	
+	In the 1st approach we are directly implementing WebApplicationInitializer where as in 2nd approach indirectly it implements WebApplicationInitializer, so tomcat will 
+	detech this class i,e LcAppIntializer.
+	
+	But how DispatcherServlet is created?
+	----------------------------------------
+	
+	Inside AbstractDispatcherServletInitializer their is method called 
+	
+	@Override
+	public void onStartup(ServletContext servletContext) throws ServletException {
+		super.onStartup(servletContext);
+		registerDispatcherServlet(servletContext);
+	}
+	
+	registerDispatcherServlet(servletContext) --> this method only does all the thing which we have done in 1st approach i,e 
+	
+	Creating WebApplicationContext, DispatcherServlet , registerDispatcherServlet with servletContext , setLoadOnStartup and URL mapping etc...
+	
+	WebApplicationContext is a interface.
+	
+	Implementation for this interface is provided by AnnotationConfigWebApplicationContext and XmlWebApplicationContext.

@@ -1,0 +1,60 @@
+	
+	Form validation is very important in both front-end and back-end also.
+	
+	If we achieve validation only in front-end what happens? The client while filling the form may disable the JS and then fill form.
+	
+	So it is very import to validate in both sides.
+	
+	Spring MVC form validation can be achieved using Hibernate Validators which provides implementation for JSR380(It only provides Specification) latest is JSR 3.9 
+	
+	Pre-requisites to do validation:
+	----------------------------------
+	Java 8
+	Spring 5.2+
+	Hibernate Validator 6.0+
+	
+	Download jar files from maven dependency:
+	--------------------------------------------
+	
+	<dependency>
+		<groupId>javax.validation</groupId>
+		<artifactId>validation-api</artifactId>
+		<version>2.0.1.Final</version>
+	</dependency>
+	
+	<dependency>
+    <groupId>org.hibernate</groupId>
+    <artifactId>hibernate-validator</artifactId>
+    <version>6.1.1.Final</version>
+	</dependency>
+
+	Validation Annotation for fields
+	-------------------------------------
+	@NotBlank --> will check whether field is empty or not.
+	@Size(only for string type) --> will check whether min characters entered or not.
+	@NotNull(only for integers) --> for example pincode.
+	@AssertTrue (only for boolean) --> ex: checkbox of terms and conditions.
+	
+	Rule:
+	-------
+	@Valid @ModelAttribute("userInfo") UserInfoDTO userInfoDTO, BindingResult result
+	
+	Spring will automatically create object of UserInfoDTO and bind the data with modelAttribute i,e userInfo.
+	
+	Always remember @Valid annotation should be before @ModelAttribute and BindingResult should be after @ModelAttribute.
+	
+	The above code will bind the data with UserInfoDTO @Valid will check the validation by going through UserInfoDTO class 
+	By using BindingResult we can fetch errors. i,e by using result.hasErrors() method.
+	
+	For end-user to show them the message use below syntax in .jsp files.
+	
+	<form:errors path="userName"></form:errors>
+	
+	For <a> tag  we should specify Context-root in href attribute:
+------------------------------------------------------------------
+  
+Context-Root --> rightclick on project --> properties --> Web Project Settings (ContextRoot)
+	
+	
+	
+	

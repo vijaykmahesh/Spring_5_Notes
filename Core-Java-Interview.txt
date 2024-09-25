@@ -1,0 +1,253 @@
+
+	How does HashMap internally work?
+	-----------------------------------
+	
+	Map<String,String> map = new HashMap<String,String>();
+	
+	1) This particular line by default creates array of buckets of size 16.
+	2) Each Bucket is LinkedList which will store Hashcode of Key, Key, Value and Next.
+	
+	map.put("abc","1");
+	
+	When the above line is executed:
+	-----------------------------------
+	
+	1) It generates hashcode for key 
+	2) by using hashcode it does some calculation and returns index.
+	3) In that particular index it will be store.
+	
+	map.get("abc");
+	
+	When the above line is executed:
+	-----------------------------------
+	
+	1) It generates a hashcode for key 
+	2) by using hashcode it does some calculation and returns index.
+	3) From that index it fetches value based on key we have given.
+	
+	map.put(null,"1");
+	
+	When the above line is executed it always stores in 0th bucket only.
+	
+	
+	
+	Hashcode:
+	---------
+	
+	1) Hashcode is unique value generated for each and every object.
+	2) For wrapper classes and String Hashcode is already overidden.
+	3) For custom class we have to overide a hashcode().
+	4) Hashcode is calculated for an object by using MemoryAddress where the object will be stored.
+	5) It does some calculation by using MemoryAddress and gives us Hashcode.
+	6) But MemoryAddress is not the hashcode.
+	
+	
+	.equals()
+	----------
+	
+	1) .equals() is a method present in object class.
+	2) For wrapper classes and String equals() is already overidden.
+	3) In case of String .equals() checks for content comparision.
+	4) For custom class, if we don't overide .equals() it takes object class .equals() which internally uses (==) for checking references, 
+		So we have to overide for custom class.
+	5) == operator basically checks for reference comparision.
+	
+	
+	* Note: 
+	 --------
+	1) If content is equal for both the objects, then their Hashcode will be same.
+	2) If hashcode is equal for both the objects, then content may or may not be same.
+	
+	
+	Immutable Objects (Singleton Design Pattern):
+	--------------------
+	Once the object is created it can't be changed.
+	
+	1) Declare a class final. 
+	2) All the properties inside class should be final.
+	3) create a contructor with field.
+	4) Only specify getters to the class but not setters.
+	
+	If their is Mutuble Object inside Immutable Object how to prevent?
+	-----------------------------------------------------------------------	
+	Student
+	------------
+	
+	final public class Student {
+
+	final private int id;
+	final private String studentName;
+	final private Address address;
+
+	public Student(int id, String studentName, Address address) {
+		this.id = id;
+		this.studentName = studentName;
+		this.address = address;
+	}
+
+	public Address getAddress() {
+		return new Address(address.getCity(), address.getState());
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public String getStudentName() {
+		return studentName;
+	}
+
+	@Override
+	public String toString() {
+		return "Student [id=" + id + ", studentName=" + studentName + ", address=" + address + "]";
+	}
+
+}
+	Address
+	------------
+	
+	public class Address {
+
+	private String city;
+	private String state;
+
+	public Address(String city, String state) {
+		this.city = city;
+		this.state = state;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
+	}
+
+	@Override
+	public String toString() {
+		return "Address [city=" + city + ", state=" + state + "]";
+	}
+
+}
+
+	Now when user calls student.getAddress() just give him a cloned object i,e copy of object.
+	
+	Below Example:
+	------------------
+	
+	public Address getAddress() {
+		return new Address(address.getCity(), address.getState());
+	}
+	
+	What if we introduce a new variable to Address say country ?
+	-----------------------------------------------------------------
+	Then our code will be broken because inside getAddress() we have only (address.getCity(), address.getState()) we have to include address.getCountry() also.
+	Assume If their is another class that class also uses Address.
+	
+	so we can prevent by using copy contructor i,e 
+	
+	declare a contructor by taking Address as a field i,e 
+	
+	inside Address class:
+	---------------------------
+	
+	public Address (Address address) {
+		this.address(address.getCity(),address.getState(),address.getCountry());
+	}
+	
+	Inside Student class:
+	-----------------------
+	
+	public Address getAddress() {
+		return new Address(address);
+	}
+	
+	Advantages of Immutable Class:
+	-------------------------------
+	1) Thread Safe.
+	2) Used as constants.
+	3) They can be used in HashMap as a Key.
+	
+	How to avoid duplicate objects inside HashMap:
+	------------------------------------------------
+	
+	1) Make sure that Custom class which we use inside HashMap will overide Hashcode and .equals().
+		because when .put() is called it first calculates hashcode of object and then inserts.
+		
+		When we are duplicating objects it first checks the hashcode if hashcode is same then it again checks for content comparision if 
+		both are same i,e if Hashcode and .equals both are same then that particular object won't get inserted.
+		
+		
+	Why HashMap Keys are Immutable? 
+	--------------------------------
+	 If we don't make class as immutable in case of hashmap, we can change properties.
+	 when we putting value to hashmap hashcode gets calculated based on properties of object.
+	 
+	 But when we use .get(key) it doesn't calculates the hashcode of object if it is immutable object i,e hashcode is cached.
+	If class is not Immutable then hashcode() is called internally when we call .get(key).
+	
+	
+	What will happen if the immutable classes are not marked as final?
+	-------------------------------------------------------------------
+	
+	The subclass can extend the main class and change property value. 
+	in subclass we must overide Hashcode and .equals().
+	
+	Below Code:
+	--------------
+	
+		FakeStudent fakeStudent = new FakeStudent("abhi");
+		
+		Student student2 = fakeStudent;
+		
+		System.out.println(student2.getName());
+		
+		Map<Student, String> map1 = new HashMap<>();
+		map1.put(student2, "statusChange");
+		
+		fakeStudent.setFakeStudentName("shashank");
+		
+		System.out.println(map1.get(student2));
+		
+		
+	 ArrayList:
+	 ------------
+	  1. The internal data structure that arraylist use is Growable array/Dynamic array / Resizable array.
+	  2. In arraylist, heterogeneous elements are allowed.
+	  3. In arraylist, we can insert a null value.
+	  4. Like all the list implemented classes arraylist allows duplicates .
+	  5. Arraylist ensures like all list implemented classes that the insertion order will be preserved. 
+	  6. ArrayList and Vectors are used most for retrieval operation as they implements the RandomAcess interface which ensures the same fetching time irrespective of the index.
+	  7. ArrayList is not a good choice for inserting the elements in the middle of the list or deleting either as internally shift operation is happening.
+		
+	 String Class:
+	 ----------------
+	 String is also Immutable Object.
+	 
+	 Example:
+	 ---------
+	 String str1 = "demo"; --> creates object inside String Constant Pool.
+	 String str2 = "demo"; --> first checks whether "demo" is present in SCP if yes then it directly points to that SCP only.
+	 
+	 
+	 String str3 = str1.concat("address"); --> it creates a new object in heap memory i,e (demoaddress) and str3 points to that heap memory.
+	 
+	 str1.hashcode(); --> since the 1st tym we are calling it calculates hashcode of individual character and combines and stores the hashcode of string.
+	 str1.hashcode(); --> If we call it again it doesn't calculates again instead it just caches it.
+	 
+	 StringBuffer:
+	 ---------------
+	 StringBuffer is mutuble object.
+	 
+	
+	
+	

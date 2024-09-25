@@ -1,0 +1,206 @@
+	
+	Pre-requisites for working without XML file
+	----------------------------------------------
+	
+	Download Maven Dependency:
+	---------------------------
+	spring-webMVC---> 5.2.22.RELEASE (version)
+	servlet-api----> 4.0.1 (version)
+	
+	Steps to be followed for creating maven project:
+	-------------------------------------------------
+	1) Create maven project
+	2) In pom.xml file add servlet and web-mvc jar
+	3) Create new class that implements WebApplicationInitializer (Which will taken by tomcat server).
+	4) In that class create and register DispatcherServlet.
+	5) Create SpringConfig class which will be annoted with @Configuration, @ComponentScan, @EnableWebMvc and write InternalResourceViewResolver for resolving JSP file.
+	6) Create new JSP file under WEB-INF/view/.JSP.
+	7) Create new Controller and return JSP file.
+	
+	--------------------------------------------
+	
+	Define Custom config and that class should implement WebApplicationIntializer.
+	
+	WebApplicationIntializer is a interface provided by Spring MVC and has only 1 method called onStartUp() (its a call back method)
+	onStartUp() will be automatically called by tomcat server we don't need to call.
+	
+	Note:
+	------
+		DispatcherServlet has its own WebApplicationContext.
+	
+	ServletContext:
+	-----------------
+	Its an interface.
+	
+	we don't need to provide implementation its the WebServer(tomcat) who provides implementation for ServletContext.
+	
+	ServletContext object will be created by WebServer(tomcat) i,e whenever we deploy our project inside WebServer(tomcat) 
+	 then WebServer(tomcat) automatically creates object of ServletContext.
+	
+	ServletContext Object created will be only 1 per web application.
+	
+	
+	
+	If we have spring-config.XML i,e (application-config.xml) file then use this approach:
+	------------------------------------------------------------------------------------------
+	
+	class HiTomcat implements WebApplicationIntializer {
+	
+	public void onStartup(ServletContext servletContext) throws ServletException {
+	
+		XmlWebApplicationContext webApplicationContext = new XmlWebApplicationContext();
+
+		webApplicationContext.setConfigLocation("classpath:application-config.xml");
+
+		//creating Dispatcher Servlet
+		DispatcherServlet dispatcherServlet = new DispatcherServlet(webApplicationContext);
+
+		// Registering Dispatcher Servlet with servletContext
+		ServletRegistration.Dynamic myCustomDispatcherServlet = servletContext.addServlet("myDispatcherServlet",
+				dispatcherServlet);
+
+		// Adding Load on Startup (which we added for before project)
+		myCustomDispatcherServlet.setLoadOnStartup(1);
+		
+		// URL Mapping
+		myCustomDispatcherServlet.addMapping("/mywebsite.com/*");
+
+	}
+	
+	}
+	
+	In spring-config.xml (application-config.xml) file
+	--------------------------------------------------------
+	
+	<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+    http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+    http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+
+
+<context:component-scan base-package="com.express.lc.controllers"></context:component-scan>
+
+</beans>
+
+
+	Without spring-config.xml (application-config.xml) file follow below approach:
+	
+	Define SpringConfig i,e (LoveCalculatorAppConfig) Class:
+	---------------------------------------------------------
+	
+	@EnableWebMvc // will be taught later
+	@Configuration
+	@ComponentScan(basePackages = "com.express.lc.controllers")
+	public class LoveCalculatorAppConfig {
+
+	}
+	
+	For Creating DispatcherServlet and Registering DispatcherServlet : 
+	----------------------------------------------------------------------
+	
+	Tomcat will automatically picks up this class and create Dispatcher Servlet since using (implements WebApplicationInitializer)	
+	
+	Developer has the complete control over the DispatcherServlet Object.
+		
+		
+	public class LoveCalculatorApplicationIntializer implements WebApplicationInitializer {
+
+	public void onStartup(ServletContext servletContext) throws ServletException {
+
+		// Creating Container
+		
+		AnnotationConfigWebApplicationContext webApplicationContext = new AnnotationConfigWebApplicationContext();
+
+		webApplicationContext.register(LoveCalculatorAppConfig.class);
+
+		// Creating DispatcherServlet
+		DispatcherServlet dispatcherServlet = new DispatcherServlet(webApplicationContext);
+
+		// Registering Dispatcher Servlet
+		ServletRegistration.Dynamic myCustomDispatcherServlet = servletContext.addServlet("myDispatcherServlet",
+				dispatcherServlet);
+
+		myCustomDispatcherServlet.setLoadOnStartup(1);
+		myCustomDispatcherServlet.addMapping("/mywebsite.com/*");
+
+	}
+
+}
+
+	Create Controller class:
+	---------------------------
+	@Controller
+	public class TestController {
+	
+	@RequestMapping("/test")
+	public String hello() {
+		
+		return "testing";
+	}
+
+}
+
+	Create new JSP page under WEB-INF/view/.jsp (testing)
+	-------------------------------------------
+	
+	<!DOCTYPE html>
+	<html>
+	<body>
+
+	<h1>My First Heading</h1>
+	<p>My first paragraph.</p>
+
+	</body>
+	</html>
+	
+	Since we are returning JSP page from Controller we have add ViewResolver in SpringConfig Class
+	--------------------------------------------------------------------------------------------------
+	
+	@Bean
+	public InternalResourceViewResolver viewResolver(){
+		
+		InternalResourceViewResolver internalResourceViewResolver = new InternalResourceViewResolver();
+		
+		internalResourceViewResolver.setPrefix("/WEB-INF/view/");
+		internalResourceViewResolver.setSuffix(".jsp");
+		
+		return internalResourceViewResolver;
+		
+	}
+	
+	Follow below steps for running MVC application without web.xml file
+	-----------------------------------------------------------------------
+	
+	1) Delete web. xml file
+	
+	2) Once deleted we will be getting error as failOnMissingWebXml is set to true please set to false in problems section of eclipse/sts
+	
+	Inside Properties tag of pom.xml file we should put the below code
+	----------------------------------------------------------------------
+	3) set failOnMissingWebXml to true in pom.xml:
+		----------------------------------------------
+		<failOnMissingWebXml>false</failOnMissingWebXml>
+	
+	4) Update Maven compiler version to higher:
+		-----------------------------------------
+		
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		
+	5) Remove tomcat server from application and again add Tomcat, Clean Server.
+	
+	6) Refresh and Clean Project.
+	
+	7) Run the project.
+
+	
+	
+	
+	
+	
+	

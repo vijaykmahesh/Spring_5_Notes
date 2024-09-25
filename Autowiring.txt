@@ -1,0 +1,123 @@
+
+	Autowire can be done in below ways:
+	----------------------------------------
+	Note : * @Autowire basically does only injecting the objects i,e without using setter and getter methods.
+
+	a) autowire byName:
+     
+
+	<bean id="heart" class="com.express.autowire.Heart"></bean>
+	<bean id="human" class="com.express.autowire.Human" autowire="byName"></bean>
+
+
+	Autowiring byName is possible when we have same reference name in java side and in
+	.XML file bean id name should be same.
+
+
+	b) autowire byType:
+
+
+	<bean id="heartObject" class="com.express.autowire.Heart"></bean>
+	<bean id="human" class="com.express.autowire.Human" autowire="byType"></bean>
+
+
+	c) autowire By using Constructor:
+
+
+	<bean id="heartObject" class="com.express.autowire.Heart"></bean>
+	<bean id="human" class="com.express.autowire.Human" autowire="constructor"></bean>
+
+
+	The above approach holds good when we have less dependency in class i,e when we have more dependency for a class, then we have to use
+	@Autowired annotation by using only java approach instead of defining in .XML file.
+
+	 
+	d) @autowire usage by using constructor
+
+
+	1)	we should define default constructor.
+	public Human() {}
+
+
+	Spring will be using default constructor for creating object instead of using --> Human(Heart heart).
+	If we don't specify default constructor we will be getting below exception:
+
+	Instantiation failed we no default constructor found. 
+	After specifying default constructor also we won't be able to get the output since it won't inject dependency. i,e DependencyInjection is off we need to make on.
+
+
+	2) In order to activate @autowired in java side we have to specify
+
+
+	<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context" xsi:schemaLocation="http://www.springframework.org/schema/beans
+	https://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context
+	https://www.springframework.org/schema/context/spring-context.xsd">
+
+
+	<context:annotation-config></context:annotation-config> tag in .XML file
+
+
+	@Autowired
+	public Human(Heart heart) {
+	System.out.println("Constructor called"); this.heart = heart;
+	}
+	 
+	e) @autowire usage by using setter methods
+
+
+	@Autowired
+	public void setHeart(Heart heart) { this.heart = heart;
+	}
+
+
+	@Autowired works in following ways
+	Autowiring is not possible for primitive and string types it is possible only for object Types. First it looks to resolve byType if it doesn't find then it looks for byName
+
+	The below example doesn't work since both are not matching
+	-------------------------------------------------------------
+	
+	<bean id="heartObject" class="com.express.autowire.Heart"></bean>
+	<bean id="octopusHeart" class="com.express.autowire.Heart"></bean>
+	<bean id="human" class="com.express.autowire.Human"></bean>
+
+
+	The below example will work since it resolves byName
+	<bean id="heart" class="com.express.autowire.Heart"></bean>
+	<bean id="octopusHeart" class="com.express.autowire.Heart"></bean>
+
+
+	<bean id="human" class="com.express.autowire.Human"></bean>
+
+
+	When we have multiple objects and we want one object to use the specify @Qualifier
+	------------------------------------------------------------------------------------
+	@Autowired
+	@Qualifier("humanHeart")
+	public void setHeart(Heart heart) {
+	System.out.println("setter method called"); this.heart = heart;
+	}
+	 
+	In .XML file
+	<bean id="humanHeart" class="com.express.autowire.Heart">
+	<property name="nameOfAnimal" value="Human"></property>
+	<property name="noOfHeart" value="1"></property>
+	</bean>
+
+
+	<bean id="octopusHeart" class="com.express.autowire.Heart">
+	<property name="nameOfAnimal" value="Octopus"></property>
+	<property name="noOfHeart" value="3"></property>
+	</bean>
+
+
+	<bean id="human" class="com.express.autowire.Human"></bean>
+
+	If we use @Autowired and @Qualifier before dependency we don't need to provide setters and constructor for class i,e
+
+
+	@Autowired
+	@Qualifier("humanHeart") 
+	private Heart heart;
+
+
