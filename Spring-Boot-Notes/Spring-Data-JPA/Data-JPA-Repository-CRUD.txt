@@ -1,0 +1,98 @@
+	
+	Repository:
+	----------------
+	//doesn't have an id
+	Book book = new Book();
+		
+	book.setBookName("bhagvatgitha");
+	book.setAuthor("seetha");
+	
+	//below code will internally uses persist() of entityManager i,e em.persist(book);
+	//It has an id associated i,e returnedBook.
+	
+	Book returnedBook = repo.save(book); ==> Insert Query
+	
+	returnedBook.setBookName("bhagvatgitha 2.0");
+	
+	//below line of code will fires select query and then update query
+	
+	repo.save(returnedBook); ==> (internally uses merge())
+	// since returnedBook has already id associated so it updates the record.
+	
+	Y it is loading the data and then updating?
+	----------------------------------------------
+	
+	a) Here book and returnedBook are same objects.
+	
+	Once repo.save(book); finished its execution entityManager is closed and returnedBook is in 
+	detached state.
+	
+	returnedBook.setBookName("bhagvatgitha 2.0");
+	==> above line of code will set value for detached object.
+	
+	Book updatedBook = repo.save(returnedBook); 
+	
+	when above line is executed below happens:
+--------------------------------------------------
+a)  entityManager object will be created but while saving i,e repo.save(returnedBook)
+	internally uses merger() so merge() will first see whether inside entityManager object 
+	is their object present or not, if their is no object 
+	
+	then it first fires a select query from database and gets the object i,e 
+		bookId = 1 , bookName = bhagvatgitha and bookAuthor  = seetha
+		
+	this object i,e bookId = 1 , bookName = bhagvatgitha and bookAuthor  = seetha ==> persist state
+	will be compared to detached object i,e bookName = bhagvatgitha 2.0 since both are diff
+	it will merge the data from which is detached state to persist state.
+
+	When object is in detached state it is available for garbage collection.
+		
+	
+	Book book = new Book();
+		
+	book.setBookName("bhagvatgitha");
+	book.setAuthor("seetha");
+	
+	Book returnedBook = repo.save(book); 
+	// after executing below statement it will be detached state i,e returnedBook.
+	
+	returnedBook.setBookName("bhagvatgitha 2.0");
+	
+	// below code will bring returnedBook from detached state to persistence state.
+	repo.save(returnedBook); ==> (internally uses merge())
+	 
+		
+	Delete Operation:
+	-----------------------
+	
+	Book book = new Book();
+		
+	book.setBookName("bhagvatgitha");
+	book.setAuthor("seetha");
+	
+	Book returnedBook = repo.save(book);
+	
+	repo.delete(returnedBook) ==> internally uses em.remove(returnedBook);
+	
+	
+	when repo.delete(returnedBook) does first fires select query then delete ?
+	---------------------------------------------------------------------------
+	
+	Book returnedBook = repo.save(book); // detached state after finishing execution
+	
+	repo.delete(returnedBook) 
+	
+	above line of statement will create entityManager but inside that no object since returnedBook
+	will be in detached state.
+	
+	so first fires select query and fetches the object into entityManager.
+	
+	what we are telling is delete returnedBook object but inside entityManager it has different object
+	which it has fetched so what it does is that i,e 
+	
+	First merges the object which is in detached state with object which entityManager has and then it
+	does following
+	
+	repo.delete(returnedBook) ==> em.remove(em.merge(returnedBook));
+	
+	

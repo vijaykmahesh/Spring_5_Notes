@@ -1,0 +1,194 @@
+
+	For hibernate to create, update or drop a table we have to configure in xml file as 
+	
+	<property name="hibernate.hbm2ddl.auto"></property>
+
+	Create --> It will create a table.
+	
+	Update --> First it checks whether table already exist in DB is yes then it just updates if table doesn't exist then it creates.
+	
+	create or drop --> It creates and drops table i,e First it creates the table and whenever we close SessionFactory it drops the table from DB.
+	
+	none --> It is By Default it does nothing.
+	
+	Validate --> It just validates the schema whether we have mentioned all fields.
+	
+----------------------------------------------------------------------------------------------------------
+	
+	@Entity
+	@Table(name = "students")
+	public class Student {
+	
+	private int id; // basic value type
+	
+	private String name; // basic value type
+	
+	private long mobile; // basic value type
+
+	@Embedded
+	private Address address; // composite value type
+	
+	}
+	
+	Since it is a composite value type it will go to corresponding class i,e Address and look for @embeddable annotation on top of class.
+	
+	For composite value type their is no Primary Key defined.
+	
+	Their will be no seperate table present, instead all fields of Address will be present in Student Class.
+	
+	Y should we declare Address properties class inside Student Class only what if have Address properties inside student class only ?
+	------------------------------------------------------------------------------------------------------------------------------------
+	
+	If we have doctor, person class all will be having address fields ryt, so inorder to reduce the redundency code.
+	
+	
+	Aggregation:
+	--------------
+	It represents Has-A’s relationship.
+	
+	In Aggregation, both the entries can survive individually which means ending one entity will not affect the other entity.
+	
+	Example: Company and Employee i,e If we close the company employees can join to other company also i,e destroying company will have no effect on employees. 
+	
+	Composition:
+	--------------
+	It represents part-of relationship.
+	
+	When there is a composition between two entities, the composed object cannot exist without the other entity.
+	
+	Example: taking example of Building i,e Room doesn't exist without Building i,e If we destroy Building then Room will also be destroyed.
+	
+	
+	BasicValueType and CompositeValueType:
+	------------------------------------------
+	
+	@AttributeOverrides:
+	------------------------
+	
+	Now scenario is for student class i want both HomeAddress and HostelAddress how will u define?
+	
+	We can do this y below code :
+	---------------------------
+	
+	@Entity
+	@Table(name = "students")
+	public class Student {
+		
+		@Id
+		@GeneratedValue(strategy = GenerationType.IDENTITY)
+		private Integer id;
+		
+		private String name;
+		
+		private Long mobile;
+		
+		@Embedded
+		@AttributeOverrides({
+			@AttributeOverride(name="addressLine1",
+							   column=@Column(name="home_address_line_1")),
+			@AttributeOverride(name="addressLine2",
+							   column=@Column(name="home_address_line_2"))
+		})
+
+		private Address homeAddress; // composite value type
+		
+		
+		@Embedded
+		@AttributeOverrides({
+			@AttributeOverride(name="addressLine1",
+							   column=@Column(name="hostel_address_line_1")),
+			@AttributeOverride(name="addressLine2",
+							   column=@Column(name="hostel_address_line_2"))
+		})
+
+		private Address hostelAddress; // composite value type
+		
+		
+
+		public Integer getId() {
+			return id;
+		}
+
+		public void setId(Integer id) {
+			this.id = id;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public Long getMobile() {
+			return mobile;
+		}
+
+		public void setMobile(Long mobile) {
+			this.mobile = mobile;
+		}
+
+		public Address getHomeAddress() {
+			return homeAddress;
+		}
+
+		public void setHomeAddress(Address homeAddress) {
+			this.homeAddress = homeAddress;
+		}
+
+		public Address getHostelAddress() {
+			return hostelAddress;
+		}
+
+		public void setHostelAddress(Address hostelAddress) {
+			this.hostelAddress = hostelAddress;
+		}
+
+	}
+
+
+	Address.java
+	---------------
+	
+	
+	@Embeddable
+	public class Address { //value type
+		
+		private String addressLine1;
+		
+		private String addressLine2;
+
+		public String getAddressLine1() {
+			return addressLine1;
+		}
+
+		public void setAddressLine1(String addressLine1) {
+			this.addressLine1 = addressLine1;
+		}
+
+		public String getAddressLine2() {
+			return addressLine2;
+		}
+
+		public void setAddressLine2(String addressLine2) {
+			this.addressLine2 = addressLine2;
+		}
+		
+	
+
+}
+
+
+@AttributeOverrides({
+			@AttributeOverride(name="addressLine1",
+							   column=@Column(name="hostel_address_line_1")),
+			@AttributeOverride(name="addressLine2",
+							   column=@Column(name="hostel_address_line_2"))
+		})
+		
+		
+	What does this line do means, it overides the column name.
+	
+	
+	

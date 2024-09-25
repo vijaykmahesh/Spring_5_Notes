@@ -1,0 +1,50 @@
+
+	Assume in a table their won't be ID given how will u make PK?
+	--------------------------------------------------------------
+	We can combine 2 columns to make PK i,e called composite PK.
+	
+	Assume Student has three columns i,e student_name, mobile_no, age and country.
+	
+	PK as --> student_name + country.
+	
+	1st approach
+	---------------
+	a) mark the fields as @Id which u want to make as composite Pk.
+	b) Create new class which implements Serializable i,e example (StudentId)
+	c) On top of entity class declare annotation called @IdClass(StudentId.class)
+	
+	If we want to fetch the student now we have to fetch it based on student_name and country i,entity
+		
+		Student student = session.get(Student.class, new StudentId("vijay", "Ind"));
+		System.out.println(student.getMobile_no()); // fetch student mobile_no.
+		
+		
+	2nd approach
+	--------------
+	a) Create new class which implements Serializable i,e example (StudentPrimaryKey) and on top of class use @Embeddable.
+		Declare student_name and country variables (since we need composite PK )
+		add a default and using fields constructor, overide hashcode and equals method.
+		
+	b) Inside entity class declare variable  StudentPrimaryKey and on top of that use @EmbeddedId annotation.
+		add a default and using fields constructor.
+		
+	While saving Student entity class:
+	------------------------------------
+		
+		StudentPrimaryKey studentPrimaryKey = new StudentPrimaryKey("abhi", "US");
+
+		Student student = new Student(studentPrimaryKey);
+
+		student.setMobile_no(9066462166L);
+		student.setAge(25);
+		
+		session.save(student);
+		
+		
+	For Fetching from DB
+	-----------------------
+		
+		Student student = session.get(Student.class, new StudentPrimaryKey("vijay", "Ind"));
+		System.out.println(student.getMobile_no());
+
+		

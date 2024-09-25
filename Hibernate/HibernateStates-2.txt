@@ -1,0 +1,38 @@
+
+	Transient
+	----------
+	The transient state is the first state of an entity object.When we instantiate an object of a POJO class using the new operator then the object is in the transient state. 
+	This object is not connected with any hibernate session. As it is not connected to any Hibernate Session, So this state is not connected to any database table. 
+	So, if we make any changes in the data of the POJO Class then the database table is not altered. Transient objects are independent of Hibernate, and they exist in the heap memory.
+	
+	Below Example:
+	-------------
+		Song song1 = new Song();
+		song1.setSongName("SDSDFSFDSFD");
+		song1.setArtist("SWEWREWE");
+	
+	Persistant
+	------------
+	Once the object is connected with the Hibernate Session then the object moves into the Persistent State.
+	
+	Below Example:
+	-----------------
+		session.save(song1);
+	
+	Detached
+	----------
+	For converting an object from Persistent State to Detached State, we either have to close the session or we have to clear its cache. 
+	As the session is closed here or the cache is cleared, then any changes made to the data will not affect the database table. 
+	
+	Below Example:
+	------------------
+	session.close();
+	
+	Once the session is closed Object is in Detached state i,e session object is destroyed but object inside that is not destroyed.
+	
+	Removed
+	--------
+	Entity is completely removed.
+	
+	
+	

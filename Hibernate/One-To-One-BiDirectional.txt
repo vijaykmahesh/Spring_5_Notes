@@ -1,0 +1,47 @@
+
+	Change Passport.java to below code: (One-to-One Bi-Directional)
+	------------------------------------------------------------------
+	
+	If we want load parent entity also then we have to bi-directional mapping.
+	
+	@OneToOne(mappedBy = "passport",cascade = CascadeType.ALL)
+	private Student student;
+	
+	
+	By doing mappedBy we are basically saying to hibernate that it is a child entity we are not having any foreign key if we want to know the owner 
+	then look at passport variable declared inside Student Class. 
+
+
+	Passport passport = session.get(Passport.class,1001); // Now parent entity will also be loaded. i,e Student entity.
+
+
+	Inside Student Class what if we write only @OnetoOne but not @joincolumn?
+	------------------------------------------------------------------------------
+	
+	Both the tables will be created but when creating foreign key it will take foreignName as passport_id (id is variableName which we give declare as PK in passport entity).
+	
+	FetchType:
+	--------------
+	
+	By default whenever we do OneToOne mapping FetchType is Eager.
+	
+	What if we want to acheive lazy loading?
+	-------------------------------------------
+	
+	If we want to load only parent entity but not child entity.
+	
+	We can achieve that by mentioning FetchType = Lazy i,e @OneToOne(fetch = FetchType.LAZY)
+	
+	Student student = session.get(Student.class,7); // onlt Student object will be loaded. 
+	
+	i,e whenever we use child entity then it will load. i,e student.getPassport() --> then only it will loaded.
+	
+	
+	By writting below code both parent and child entity will be deleted from database i,e if we mention cascade = cascadeType.all
+	-------------------------------------------------------------------------------------------------------------------------------
+	
+		Student student = session.get(Student.class, 3);
+		session.delete(student);
+		
+	
+	

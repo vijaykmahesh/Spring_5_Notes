@@ -1,0 +1,71 @@
+	
+	Note : Its always recommended to do jar packaging.
+	
+	FatJar vs War:
+	------------------
+	
+	If we remove or comment the below build tag from pom.xml file 
+
+	<build>
+			<plugins>
+				<plugin>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-maven-plugin</artifactId>
+				</plugin>
+			</plugins>
+	</build>	
+	
+	when we run our application then normal jar will be build, and 
+	it won't contain main() and server will not be added and dependencies will not present.
+	
+	We won't able to execute the jar file.
+	
+	FatJar
+	---------
+	
+	When ever we add below build tag into pom.xml file  
+	
+	<build>
+			<plugins>
+				<plugin>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-maven-plugin</artifactId>
+				</plugin>
+			</plugins>
+	</build>	
+	
+	FatJar will be build which contains combination of classFiles, properties, dependecies and webserver included.
+	
+	inside pom.xml file spring-boot-starter-tomcat dependency doesn't have scope i,e it will be available whenever we create build. 
+	
+	then we need to add dependency inside pom.xml i,e 
+	
+		<plugin>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-maven-plugin</artifactId>
+		</plugin>
+		
+	
+	War Packaging means if we want to manual deployment i,e tomcat server won't be embedded inside War.
+	If we want to have external server and deploy the war into that server.
+	
+	It is a traditional approach.
+	
+	If we use .jsp pages in the application then always use WAR packaging and deploy into the external server. 
+	
+	In case of war packaging inside pom.xml file spring-boot-starter-tomcat dependency has scope provided i,e 
+	when we do maven install i,e build after that tomcat server will not be their inside war file.
+		
+	Usage of mvnw and mvnw.cmd (maven wrapper):
+	------------------------------------------------
+
+	mvnw --> It is for Mac
+	mvnw.cmd --> It is for windows.
+	
+	If we cloned the spring-boot project from repository and if we want to execute project we don't
+	need to install maven in windows i,e we can execute the project instead directly we can execute.
+	
+	we can execute maven commands like mvn install, mvn clean etc... in command prompt from project root folder.
+	
+
+	

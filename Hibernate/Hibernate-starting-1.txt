@@ -1,0 +1,50 @@
+
+	Session Factory is basically used for creating DataSource and it is heavy weight object.we should not create Session Factory more than once for entire application.
+	
+	Session Factory is immutable class i,e Singleton class.
+	
+	Session object can be many i,e one client only 1 session object can be used. 
+	
+	DataSource is nothing but if we want to connect to DB we want to get URL,username and password of database. It manages connection
+	
+	Configuration Helps us to bootstrap the application.
+	
+	@Entity tells hibernate that it represent a table in database.it is not considered as a bean. i,e it thinks that inside database we have a table called song.
+	
+	configuration.configure("hibernate.cfg.xml"); --> this will automatically look for hibernate.cfg.xml if we don't mention anything.
+	
+	Hibernate helps us to write a sql query.
+
+	
+	/**
+	 * Enable logging of generated SQL to the console
+	 */
+	String SHOW_SQL ="hibernate.show_sql";
+	
+	How we will tel hibernate to generate i,e write query it can be done with the help of Transaction.
+	
+	Exception:
+	-----------
+	No identifier specified for entity --> means no PK defined for entity class.
+	
+	@Id --> it specifies it is a PK.
+	
+	If we want to apply PK as auto-increment we can do it by using mysql workbench i,e select auto-increment by going to that specific table.
+	
+	@GeneratedValue(strategy = GenerationType.IDENTITY) --> This line of code basically takes the Pk value from database and assign. i,e 
+	we are telling Hibernate that we are not responsible to generate the PK value instead DB is responsible and u just map the generated value from DB.
+	
+	Another advantage of using GenerationType.IDENTITY is query will be fired when we do .save() only i,e if we don't write GenerationType.IDENTITY query will fired 
+	when this line is executed i,e session.getTransaction().commit();
+															
+	session.save(song1); --> This line will persist the data into database but we won't be able to see it i,e It will be saved in cache memory.
+	
+	Run below query at a time in MYSQL workbech.
+	-------------------------------------------
+	set transaction isolation level read uncommitted
+	select * from `hibernate-morning`.song;
+	
+	Now we can see the values in the database.
+	
+	session.getTransaction().commit(); --> Actually when this line execute data is saved into database.
+ 	

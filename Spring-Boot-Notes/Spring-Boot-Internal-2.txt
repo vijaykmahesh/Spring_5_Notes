@@ -1,0 +1,92 @@
+
+	ServletWebServerFactoryAutoConfiguration class which helps us to do autoconfigure i,e setting up a webserver like
+	tomcat,jetty or UnderTow.
+	
+	spring-boot-started-web:
+	---------------------------
+	When we add spring-boot-started-web dependency into pom.xml file, it internally pulls 
+	all other dependencies like spring-web,spring-web-mvc,spring-context, spring-boot-starter-tomcat etc...
+	
+	spring-boot-starter-tomcat:
+	-------------------------------
+	It also contains spring-boot-starter-tomcat and this jar file is called a embedded tomcat server i,e 
+	we don't have to explicitly deploy our application to tomcat serveri,e how we use to do in spring mvc project.
+	
+	spring-boot-starter-parent:
+	-------------------------------
+	
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.0.7</version>
+	</parent>
+	
+	when we add above dependecy into pom.xml file all the other dependencies will inherit parent version.
+	
+	In spring-boot we don't have to manage version by our self instead we have to add a 
+	parent dependency called spring-boot-starter-parent i,e 
+	
+	It will also manage java version internally.
+	
+	But if we want to overide java version we can explicitly mention in pom.xml file i,e 
+	
+	<properties>
+		<java.version>19</java.version>
+	</properties>
+	
+	It also helps us to detect the application.properties file and load it automatically.
+	 
+	
+	If we don't want to use Tomcat instead we want to use Jetty server ?
+	-------------------------------------------------------------------------
+	Inside pom.xml file inside spring-boot-started-web dependency exclude spring-boot-starter-tomcat dependency.
+	
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-tomcat</artifactId>
+				</exclusion>
+			</exclusions>		
+		</dependency>
+		
+	and below this dependency add this dependency i,e 
+	----------------------------------------------------
+	
+			<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-jetty -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-jetty</artifactId>
+			<version>3.1.0</version>
+		</dependency>
+		
+	This says that exclude the tomcat server and add jetty server.
+	
+	Now application gives error saying : Unable to start web server
+	
+	For resolving this error just add jakarta.servlet-api jar dependency.
+	
+	
+	Responsibility of SpringApplication.run() ?
+	----------------------------------------------
+	
+	To start application we must and should provide source class 
+	Saying all my configuration is present inside this class i,e.
+	
+	SpringApplication sp = new SpringApplication(sourceClassName);
+	sp.run();
+	
+	what does sp.run() ?
+	-----------------------
+	
+	a) It creates application context.
+	b) Printing Banner.
+	c) printing line saying started application in ms etc...
+	d) it activates the listener.
+	
+	The alternative to web.xml file is ServletInitializer which extends SpringBootServletInitializer.
+	Whenever we deploy our application to external tomcat server we need to make sure that class should extend 
+	SpringBootServletInitializer mandatorily.
+	

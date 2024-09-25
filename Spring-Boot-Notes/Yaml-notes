@@ -1,0 +1,173 @@
+
+	YAML:
+	------
+	YAML is a data serialization language often used for writting config files.
+	
+	name: Vijay
+	
+	name is key and vijay is called scalar(Its a single stored value).
+	between the key and scalar their should be space its mandatory.
+	
+	# --> we can specify comments
+	
+	#details of user
+
+name: Vijay  # i am writing name
+age: 25
+country: India
+name1: "Vijay"
+name2: 'Vijay'
+
+#declare array 1st way
+
+java: ["spring", "hibernate", "j2ee"]
+
+#another way of declaring array i,e block style
+
+java1: 
+- spring
+- hibernate
+- j2ee
+
+javaLanguage: 
+- spring:
+   - spring core
+   - spring mvc
+   - spring orm
+- hibernate:
+   - hibernate core
+- j2ee
+
+#Dictionary
+
+person:
+   - billing address:
+      lane1: xyz street
+      city: bangalore
+      state: karnataka
+   - living address: 
+       lane1: abc street
+       city: bbsr
+       state: odisha
+   - personal details:
+        name: Vijay 
+        age: 25
+        country: India 
+		
+#Array of students
+
+Director:
+    name: Spielberg
+    student:
+    - 
+        name: vijay
+        year: 1997
+        
+    - 
+        title: suresh 
+        year: 1991
+		
+
+#copying value i,e giving alias name
+
+Director:
+    name: Spielberg
+    student:
+    - 
+        name: vijay
+        year: &yearborned 1998  #yearborned is reference name for 1998
+        
+    - 
+        title: suresh 
+        year: *yearborned       #accessing value using * and name of reference.
+		
+
+#copying object reference
+
+experience:
+    5plus: &5pluscandidate
+           java: true
+           sql: true
+           angular: false
+student:
+    - 
+        name: vijay
+        year: &yearborned 1998
+        experience: *5pluscandidate
+        
+        
+    - 
+        title: suresh 
+        year: *yearborned
+        experience: *5pluscandidate
+    
+    -
+        title: sharath 
+        year: 1999
+        experience: 
+            java: true
+            angular: true 
+			
+
+#overiding the value and copying subclass 
+
+experience:
+    5plus: &5pluscandidate
+           year: 5plus
+           java: true
+           sql: true
+           angular: false
+           
+    7plus: &7pluscandidate
+           <<: *5pluscandidate    #copying all properties from 5pluscandidate and overiding year: 5plus to 7plus
+           year: 7plus
+           scrummaster: true
+           sos: true
+student:
+    - 
+        name: vijay
+        year: &yearborned 1998
+        experience: *5pluscandidate
+        
+        
+    - 
+        title: suresh 
+        year: *yearborned
+        experience: *5pluscandidate
+    
+    -
+        title: sharath 
+        year: 1999
+        experience: *7pluscandidate
+		
+	
+#Set representation i,e valus is null
+
+documents: 
+            passport: null
+            10th: null
+            12th: null
+			
+			or
+			
+documents: 
+            ? passport
+            ? 10th
+            ? 12th
+			
+#complex data i,e it should start with ? and a space
+
+? this is 
+  a multiline
+  key
+: this is its value
+
+
+#2nd example
+
+? 
+ - spring + hibernate
+ - springboot + microservices
+: 
+ - http://www.seleniumexpress.com/spring
+ - http://www.seleniumexpress.com/ms

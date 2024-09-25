@@ -1,0 +1,156 @@
+
+	customer and Order: (Uni-Directional)
+	-----------------------------------------
+	
+	In one-to-many relation always 3rd table will be merged with many side.
+	
+	Always foreign key will be their in many side. i,e Order is the owner
+	
+	Customer.java
+	--------------
+	@Entity
+	@Table(name = "Customers")
+	public class Customer { //one side
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int customer_id;
+	
+	private String customerName;
+	
+	private String mobileNo;
+
+	public int getCustomer_id() {
+		return customer_id;
+	}
+
+	public void setCustomer_id(int customer_id) {
+		this.customer_id = customer_id;
+	}
+
+	public String getCustomerName() {
+		return customerName;
+	}
+
+	public void setCustomerName(String customerName) {
+		this.customerName = customerName;
+	}
+
+	public String getMobileNo() {
+		return mobileNo;
+	}
+
+	public void setMobileNo(String mobileNo) {
+		this.mobileNo = mobileNo;
+	}
+	
+}
+
+	Order.java
+	------------
+	
+	@Entity
+	@Table(name = "Orders")
+	public class Order { // many side
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int order_id;
+
+	private String item_name;
+
+	private Double cost;
+
+	// FK customer_id
+
+	@ManyToOne(cascade = {CascadeType.PERSIST})
+	@JoinColumn(name = "customer_id")
+	private Customer customer; 
+
+	public int getOrder_id() {
+		return order_id;
+	}
+
+	public void setOrder_id(int order_id) {
+		this.order_id = order_id;
+	}
+
+	public String getItem_name() {
+		return item_name;
+	}
+
+	public void setItem_name(String item_name) {
+		this.item_name = item_name;
+	}
+
+	public Double getCost() {
+		return cost;
+	}
+
+	public void setCost(Double cost) {
+		this.cost = cost;
+	}
+
+	public Customer getCustomer() {
+		return customer;
+	}
+
+	public void setCustomer(Customer customer) {
+		this.customer = customer;
+	}
+
+}
+	
+	How to save in case of one-to-many (If we don't use cascadeType)
+	------------------------------------------------------------------
+	
+	First we have to save non owning entity i,e customer then only we have to save owning entity i,e Order
+	Since in order table we have FK of customer we can't save first non owning entity.
+	
+	session.save(customer);
+	session.save(order);
+	
+	What if we want to save First Order then Customer?
+	
+	
+	Make below changes in order.java class
+	----------------------------------------
+	
+	@ManyToOne
+	@JoinColumn(name = "customer_id",nullable = false)
+	private Customer customer;
+	
+	
+	Since now we are making customer as not nullable if we try to save first order then customer it will fail to save into DB i,e since customer shouldn't be null
+	
+	session.save(order);
+	session.save(customer);
+	
+	What if we don't want to use 2 times save method? i,e can we save by using only owner entity i,e order
+	---------------------------------------------------------------------------------------------------------
+	
+	No because we haven't specified cascadeType.PERSIST in owner i,e order so it won't work.
+	
+	if we specify in order class below code will work
+	-------------------------------------------------
+	
+	@ManyToOne(cascade = CascadeType.PERSIST)
+	@JoinColumn(name = "customer_id")
+	private Customer customer;
+	
+	inside main class 
+	--------------------
+	
+	We want use JPA method to save order i,e 
+	
+	session.persist(order);
+	
+	
+	Note :
+	--------
+		a) Make sure that we won't be using cascadeType.remove in owning entity i,e many side.
+		
+		b) Always foreign key will be their in many side.
+		
+		
+	

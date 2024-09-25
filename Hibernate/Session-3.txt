@@ -1,0 +1,53 @@
+
+	Inorder to activate logger we can use log4j properties.
+	
+	Session is nothing but a persistant context.
+	
+	Session session = factory.openSession(); --> Session object will be created and one connection will be maintained to Database.
+	
+	Song songUpdated = session.get(Song.class, 1); --> It will fire Select query.
+	
+	After firing Select query a proxy object will be maintained. i,e totaly 2 objects will be their one inside session and other is proxy.
+	
+	songUpdated.setSongName("Kannu updated"); --> First it checks whether 2 objects are same if yes no update query will be fired or else it will fire update query.
+											  --> i,e by doing dirty checking
+											  
+	without writting this line of code i,e session.update(songUpdated); update query will be fired.
+	
+	session.getTransaction().commit(); --> corresponding data will be updated into database.
+	
+	
+	Merge:
+	------
+	Follow below code for merge operation
+	----------------------------------------
+	
+		SessionFactory factory = HibernateUtils.getSessionFactory();
+		Session session = factory.openSession();
+		session.beginTransaction();
+		
+		Song song = session.get(Song.class,1);
+		Sysout(song);
+		
+		session.getTransaction().commit();
+		session.close(); // 1st session is closed 
+		
+		song.setSongName("new song"); // object is in detached state
+		
+		Session session2 = factory.openSession(); //open new Session
+		session2.beginTransaction();
+		Song song2 = session.get(Song.class,1); // here again same object will be loaded from DB 
+		
+		session2.update(song); 
+		// Exception will occur saying NonUniqueObjectException.
+		// we are saying to hibernate that song object and song2 both should managed.
+		// song object song2 both have same PK but hibernate says which object should we save into DB conflict will occur.
+		
+		session2.getTransaction().commit();
+		
+		Inorder to resolve this conflict we can use session.merge();
+		
+		
+		
+		
+		

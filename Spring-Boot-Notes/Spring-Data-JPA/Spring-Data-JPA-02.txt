@@ -1,0 +1,97 @@
+
+	SpringData is a project i,e:
+	
+	How u can connect to the database is by using these below ways 
+	
+	1) JDBC
+	2) JPA Repository
+	3) MongoDb Repository(For No SQL Database)
+	4) ldap Repository.
+	
+	For JPA implementation are Hibernate,Mybetis etc...
+	
+	JpaRepository(I)(which is from spring-data-jpa.jar) extends ListCrudRepository(I) (which is from spring-data-commons.jar), ListPagingAndSortingRepository
+	
+	ListCrudRepository extends CrudRepository  (which is from spring-data-commons.jar)
+	
+	CrudRepository(I) extends Repository(I) (which is from spring-data-commons.jar)
+	
+	Repository:
+	---------------
+	
+	Repository its a marker interface which we use for all spring data projects i,e JPA,JDBC,MongoDb etc...
+	
+	Whenever we extends any interface with Repository then it is eligible for @enableJpaRepository scanning.
+	
+	
+	JpaRepository:
+	-----------------
+	
+	If we create interface for example below:
+	
+	interface StudentDAO extends JpaRepository<Student, Integer>{
+	
+	}
+	
+	Then Spring will generate a code for StudentDAO as below:
+	---------------------------------------------------------------
+	
+	@Repository
+	public class StudentDAOImpl implements StudentDAO {
+	
+	@Autowired
+	EntityManager entityManager;
+	
+	public void save(Student student){
+	
+	entityManager.save(student);
+	
+	}
+	
+	etc...
+	
+	}
+	
+	Which above code uses the concept of JDK Proxy as discussed in early sessions.
+	
+	Whenever the interface extends to Repository then only spring creates an object of repository.
+	
+	spring-boot-starter-data-jpa (Dependency):
+	-------------------------------
+	Once we add this dependency into our pom.xml file then it pulls other related dependency
+	like spring-boot-started-jdbc,hibernate-core, hikari-pool etc...
+
+
+	
+	@EnableJpaRepository:
+	-------------------------
+	Activate the repository feature,scan repository interfaces and help with the
+	DAOImpl class creation from repository class (only in case if we don't use spring-boot 
+	instead if we want to write the logic by ourself).
+
+
+	But in case of Spring boot then we don't need to mention @EnableJpaRepository if 
+	the repository is in the same package or subpackage.
+	
+	But if it is in different package then only we need to mention @EnableJpaRepository.
+	
+	
+	For confirmation do this your application will not work?
+	
+	@SpringBootApplication(exclude=DataSourceAutoConfiguration.class)
+	------------------------------------------------------------------
+	Then we need to create our own DataSource implementation.
+	
+	@SpringBootApplication(exclude=HibernateJpaAutoConfiguration.class)
+	--------------------------------------------------------------------
+	Which creates LocalContainerEntityManagerFactoryBean class.
+	
+	@EntityScan:
+	-------------
+	If we keep our entity class in seperate package not the subpackage of main class
+	then we need to enable explicitly like 
+	
+	@EntityScan("entity") ==> now this scans the entity class.
+	
+	If we keep our entity class in subpackage of main class then we don't need to
+	mention the above annotation.

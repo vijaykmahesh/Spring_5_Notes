@@ -1,0 +1,74 @@
+	
+	Spring Boot:
+	------------------
+	Before Spring Boot 3 spring.factories files used have autoconfigure files, 
+	we can find it in spring-boot-autoconfigure.jar --> meta-inf --> spring.factories
+	
+	But after Spring Boot 3, 
+	we can find it in spring-boot-autoconfigure.jar --> meta-inf --> 
+	spring --> org.springframework.boot.autoconfigure.AutoCnfiguration.imports(Package)
+	which will autoconfigure.
+	
+	@SpringBootApplication annotation internally has @SpringBootConfiguration --> @Configuration --> 
+	
+	@SpringBootApplication annotation internally has @EnableAutoConfiguration.
+	
+	@SpringBootApplication annotation internally has @ComponentScan which will scans all packages under root i,e 
+	under main() what are all the packages available those will be scanned.
+
+	@SpringBootConfiguration is an alternative to the @Configuration annotation. 
+	The main difference is that @SpringBootConfiguration allows configuration to be automatically located. 
+	This can be especially useful for unit or integration tests.
+	
+	DispatcherServletAutoConfiguration:
+	--------------------------------------
+	
+	DispatcherServletAutoConfiguration is class which helps to autoconfigure DispatcherServlet in SpringBoot.
+	But it is based on @ConditionalOnClass(DispatcherServlet.class) i,e 
+	If DispatcherServlet.class is present inside class path then load DispatcherServletAutoConfiguration.
+	
+	@SpringBootApplication annotation internally has @EnableAutoConfiguration annotation which enables autoconfiguration,
+	i,e It first finds spring-boot-autoconfigure.jar --> meta-inf --> 
+	spring --> org.springframework.boot.autoconfigure.AutoConfiguration.imports
+	
+	Inside org.springframework.boot.autoconfigure.AutoConfiguration.imports file we define all autoconfiguration 
+	It doesn't load all autoconfiguration instead 
+	
+	For example : If we want to load DispatcherServlet.
+	
+	It goes to DispatcherServletAutoConfiguration class on top of the class it has defined 
+	@ConditionalOnClass(DispatcherServlet.class) i,e if it finds DispatcherServlet.class inside classpath 
+	then only it intializes DispatcherServlet.
+	
+	How spring knows is it a web based application or stand-alone application ?
+	---------------------------------------------------------------------------------
+
+	It is based on jar which we add into pom.xml file i,e 
+	when we add generate spring boot project it generates a jar file called spring-boot-starter-web which internalls has 
+	spring-web depedency and spring-boot-starter-tomcat due to this it comes to know that it is a web based application.
+	
+	How WebApplicationContext is loaded ?
+	---------------------------------------
+	
+	SpringBoot has main() inside which it has run() which internalls --> run(String... args) 
+	--> which creates WebApplicationContext using createApplicationContext() based on webApplicationType i,e (SERVLET or REACTIVE)
+	
+	Inside resources/META-INF/spring/(create new file called)org.springframework.boot.autoconfigure.AutoConfiguration.imports
+	Inside this file declare all AutoConfiguration classes.
+	
+	application.properties is getting loaded automatically how ? we will discuss
+	
+	inside src/main/resources --> templates(It is different from jsp file) i,e where we can store thymlef,velocity etc...
+	
+	inside src/main/resources --> static(where we will store images,css,javascript etc..)
+	
+	
+	How Banner is getting loaded in SpringBoot ?
+	------------------------------------------------
+	inside run() --> we have a method called printBanner() which is present inside SpringApplication.class prints banner. 
+	
+	If we don't want to autoconfigure DispatcherServlet then we can use @SpringBootApplication(exclude = DispatcherServletAutoConfiguration.class)
+	i,e now we have to explicitly configure DispatcherServlet.
+	
+	
+	

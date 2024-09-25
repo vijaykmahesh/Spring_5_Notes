@@ -1,0 +1,61 @@
+
+	By using ObjectMapper we can fetch the data from json and map into Java Object 
+	Also we can write a Java Object to JSON File.
+	
+	Make sure that JSON File propertyName and POJO class have same.
+	
+		Reading a JSON object and convert to Java Object
+		-----------------------------------------------------
+		
+		ObjectMapper mapper = new ObjectMapper();
+		Student student = mapper.readValue(new File("data/student.json"),Student.class);
+		System.out.println(student);
+		
+		
+		Writting a JavaObject to Json File
+		-------------------------------------------
+		
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.enable(SerializationFeature.INDENT_OUTPUT); --> To get Line Break in JSON File
+			
+		Student student = new Student();
+		student.setAddress("BLR");
+		student.setName("Vijay");
+		
+		mapper.writeValue(new File("data/mystudent.json"), student);
+		
+		
+		@JsonIgnoreProperties(ignoreUnknown = true)
+		-----------------------------------------------
+			It is basically used when we define some fields in json but not in POJO class 
+			Just ignore fields which are not in POJO class.
+			
+		@JsonIgnoreProperties(value = {"isActive","name"})
+			If we don't want to bind  properties i,e isActive and name won't be binded.
+			
+			
+		How to map(bind) boolean property:
+		------------------------------------
+		
+		Whenver we are binding boolean value if it is isActive then the setter or getter while we are generator it will look for getIsActive().
+		
+		If we don't want to change getter then use @JsonProperty upon boolean field. i,e 
+		
+		@JsonProperty("isActive")
+		private boolean isActive;
+		
+		If the propertyName in json and POJO class is not same then also we want to bind then use @JsonProperty
+		in Json file we have fullName property but in POJO class we have name then 
+		
+		@JsonProperty("fullName")
+		private String name;
+		
+		
+		If JSON is array then use 
+		
+		Student[] student = mapper.readValue(new File("data/student.json"), Student[].class);
+											or
+		List<Student> asList = Arrays.asList(mapper.readValue(new File("data/student.json"), Student[].class));
+
+		System.out.println(asList);
+		

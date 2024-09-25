@@ -1,0 +1,22 @@
+
+		Book book = new Book();
+		
+		book.setBookName("2 states");
+		book.setAuthor("param");
+		
+		Book returnedBook = repo.save(book); // persist()
+		
+		returnedBook.setBookName("2 states 2.0");
+		
+		System.out.println("book" +book.hashCode()+ "returnedBook" +returnedBook.hashCode());
+		
+		Book updatedBook = repo.save(returnedBook); // merge()
+		
+		updatedBook.setBookName("2 states 3.0");
+		
+		System.out.println("updatedBook" +updatedBook.hashCode()+ "returnedBook" +returnedBook.hashCode());
+		repo.save(updatedBook);
+		
+		
+		
+		y updated book and returnedBook object is different object?

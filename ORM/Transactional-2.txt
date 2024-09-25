@@ -1,0 +1,29 @@
+
+	For each and every operation we have to write this line:
+	----------------------------------------------------------
+	session.beginTransaction();
+	session.getTransaction().commit();
+	
+	@Transactional annotation helps us to maintain transaction and we can avoid writting above two lines of code always.
+	
+	Whenever method is called spring will maintain transaction behind the scene.i,e 
+	spring will automatically open and close transaction.
+	
+	
+	Whenever we use @Transactional on top of method we should define below method inside config class or else we 
+	will be getting below exception i,e 
+	
+	could not obtain transaction-synchronized session for current thread
+	
+	@Bean
+	public HibernateTransactionManager transactionManager(){
+		
+		HibernateTransactionManager manager = new HibernateTransactionManager();
+		manager.setSessionFactory(sessionFactory);
+		
+		return manager;
+	}
+	
+	and mark config class as @EnableTransactionManagement.
+
+	

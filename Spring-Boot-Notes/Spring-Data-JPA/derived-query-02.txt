@@ -1,0 +1,72 @@
+	
+	
+	Employee findByName(String name);
+	---------------------------------------
+	below method returns unique record from the database.
+	
+	
+	List<Employee> findByName(String name);
+	--------------------------------------------
+	below method returns 1 or more records from the database.
+	
+	
+	what is diff between findByName(String name) vs findAllByName(String name) ?
+	-----------------------------------------------------------------------------------
+	
+	Their is no technical difference both can be used but in case of 
+	findAllByName(String name) ==> All is not a keyword.
+	
+	
+	Syntax for findBy:
+	-----------------------
+	
+	find[limit]by[properties][comparision][ordering]
+	
+	
+	Example1 (limit):
+	-------------------
+	
+	findTop2ByName(String name);  or findFirst2ByName(String name);
+	==> It finds first 2 records from database having name.
+	
+	
+	Example2:
+	----------
+	
+	findbyNameOREmail(String name, String email); ==> Fetches records which has name or email.
+
+	i,e where name= '' OR email=''.
+	
+	
+	Example3 (Comparision):
+	-----------------------------
+	
+	findByTierGreaterThan(int tier); ==> GreaterThan ==> comparision.
+	
+	i,e returns all employees who has tier greater than.
+	
+	
+	Example4 (Comparision):
+	-----------------------------
+	
+	findByTierGreaterEqual(int tier); ==> GreaterThan ==> comparision.
+	
+	i,e returns all employees who has tier greater than equal.
+	
+	
+	Example5 (Comparision):
+	-----------------------------
+	
+	findByDateOfJoiningBetween(LocalDate startDate, LocalDate endDate); ==> Between ==> comparision.
+	
+	i,e returns all employees who joining date between.
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	

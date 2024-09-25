@@ -1,0 +1,172 @@
+
+
+From SpringBoot 2 first it loads data.sql if present and then it creates table with the help hibernate.
+	
+	How to bootstrap the data into database by using data.sql when application launches ?
+-----------------------------------------------------------------------------------------
+	
+	Mysql is not a embedded database i,e It is a permanent database .
+	
+	For Mysql database should add below property into application.properties file
+	
+	spring.sql.init.mode=always ==> other than H2 database.
+	
+	
+	In case of H2 database if we don't add below property also it will work since by default it is H2.
+	
+	spring.sql.init.mode=embedded ==> by default is H2 database
+	
+	
+	spring.jpa.defer-datasource-initialization=true 
+-----------------------------------------------------------	
+	
+	==> What above property does is first checks whether the table is created then only it inserts the record
+		into database.
+		
+	==> If we don't specify the above property then it first loads data.sql which tries to 
+		insert the record before creating table.
+		
+		Then we will be getting error saying below:
+		------------------------------------------------
+		Error creating bean with name 'dataSourceScriptDatabaseInitializer' i,e
+		
+		Then it will give exception saying table doesn't exist. 
+		
+		
+	Bootstrap data using H2 Database i,e In-Memory Database(Server memory)
+	--------------------------------------------------------------------------
+	
+	H2 is a server memory database whenever we stop the application its data also is destroyed.
+	
+	a) First add H2 database dependency into pom.xml
+	b) whenever we start the application in console it will provide url which specifies the H2
+		database username and password. i,e 
+		
+		url=jdbc:h2:mem:myh2db user=SA
+		
+		Here myh2db ==> database, username=SA and password is "".
+	
+	we don't have to enable spring.sql.init.mode, since by default it is embedded.
+	
+	Only enable the below property:
+	------------------------------------
+	spring.jpa.defer-datasource-initialization=true.
+	
+	For accessing H2 Database:
+	-----------------------------
+	We need to access H2 database through web-browser only, so we need a url.
+	
+	Follow below steps:
+	------------------------
+	
+	1) we need to add spring-web dependency into pom.xml file (to open in web-browser)
+	2) add below property into application.properties file (to activate the console)
+	
+		spring.h2.console.enabled=true ==> to enable the console i,e to show below line 
+		
+		H2ConsoleAutoConfiguration console available at '/h2-console'. then it will activate h2-console.
+		
+		
+	But if we have dev-tools dependency in spring-boot but if we don't have spring-web dependency 
+	then, we don't need to mention below property i,e 
+	
+	==> spring.h2.console.enabled=true 
+	
+	Because dev-tools dependency internally activates.
+	
+	
+	If we have only spring-web dependency in pom.xml, then we must and should activate 
+	spring.h2.console.enabled=true in application.properties file.
+		
+	If we don't specify the database name in application.properties then it keeps on changing so,
+	specify the name to database by using below property.
+	
+	spring.datasource.url=jdbc:h2:mem:myh2db.
+	
+			
+	In browser give below url:
+	-------------------------------
+	i,e localhost:8080/h2-console.
+	
+	
+	If we want to store the data permanently then we can use file:
+	----------------------------------------------------------------------
+	jdbc:h2:file:./data/myh2db.  => we will learning later.
+	
+	
+	
+	
+	Learnt from Old Batch Video i,e Spring + Hibernate Bootcamp(Boot17 and 18)
+	-------------------------------------------------------------------------------
+	
+	schema.sql vs data.sql
+	----------------------------
+	
+	What if we want the full control of creating tables and inserting the record by ourself?
+	
+	We can remove/comment below property from application.properties file
+-------------------------------------------------------------------------------	
+	spring.jpa.defer-datasource-initialization=true
+	spring.jpa.hibernate.ddl-auto=none
+	
+	
+	In case of H2 database
+	------------------------------
+	
+	Inside schema.sql file we should write DDL commands for create/updating the tables.
+	
+	Then we can use schema.sql for creating tables which will be loaded automatically and then loads 
+	data.sql file for inserting the records into database.
+	
+	
+	But in case of Permanent Database like Mysql,oracle etc... mention below property
+	---------------------------------------------------------------------------------------
+	spring.sql.init.mode=always ==> which specifies we are using Permanent database.
+	
+	Comment below properties:
+	------------------------------
+	spring.jpa.defer-datasource-initialization=true
+	spring.jpa.hibernate.ddl-auto=none // since we are creating tables explicitly
+	
+	
+	Now tables will be created and records will be inserted into database.
+	
+	
+	Can we change the data.sql file name ? yes but how 
+	--------------------------------------------------------
+	
+	mydata.sql ==> change the name
+	 
+	If this wants to work then in application.properties file specify below property
+	
+	spring.sql.init.data-locations=classpath:mydata.sql
+	
+	Can we change the schema.sql file name ? yes but how 
+	--------------------------------------------------------
+	
+	myschema.sql ==> change the name
+	 
+	If this wants to work then in application.properties file specify below property
+	
+	spring.sql.init.schema-locations=classpath:myschema.sql
+	
+	
+	What if we 2 database i,e H2 and Mysql(If we want to switch the database) ?
+	-----------------------------------------------------------------------------
+	
+	For this we have to activate profiles in application.properties i,e 
+	
+	spring.profiles.active =
+	
+	
+	What if we want to have different data.sql and schema.sql for 2 different database(ex:mysql and H2)
+	-----------------------------------------------------------------------------------------------------
+	
+	Changed Name for mysql specific
+-------------------------------------	
+	data-mysql.sql 
+	schema-mysql.sql
+	
+	Inside application-mysql.properties file add below properties :
+	----------------------------------------------------------------
+	spring.sql.init.platform=mysql

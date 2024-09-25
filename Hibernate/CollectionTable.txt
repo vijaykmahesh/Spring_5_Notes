@@ -1,0 +1,142 @@
+
+	How to Store a Student NickNames ? i,e each student can have many NickNames
+	-----------------------------------------------------------------------------
+	
+	@ElementCollection
+	@CollectionTable(name = "nicknames", joinColumns = @JoinColumn(name = "stud_id"))
+	List<String> nickNames;
+	
+	1st option is using @OneToMany Relation
+	-----------------------------------------
+	Problem is What if we don't want to create seperate entity.
+
+	
+	we can acheive this way i,e look into image of collection-table
+	------------------------------------------------------------------
+	
+	@ElementCollection
+	@CollectionTable(name = "nicknames", joinColumns = @JoinColumn(name = "stud_id"))
+	List<String> nickNames;
+	
+	@CollectionTable --> it will create collection-table i,e create seperate table by default TableName will be student_nickNames
+	
+	To know for framework it is embeddable type we should write @ElementCollection.
+	
+	@ElementCollection --> By default Loading is Lazy.
+	
+	@CollectionTable(name = "nicknames", joinColumns = @JoinColumn(name = "stud_id"))
+	
+	name = "nicknames" --> customize TableName 
+	joinColumns = @JoinColumn(name = "stud_id") --> changing FK name
+	
+	Note their won't be PK present inside nicknames Table i,e we won't be able to fetch record individually we must go through
+	Student table only.
+	
+	If we want create PK for table called nicknames we can use composite i,e combination of FK+nicknames(column).
+	
+	Use Set instead of List because Set doesn't allow duplicates.
+	
+	we can use @OrderColumn --> by this u can come to know in what order we have added data to the table if we use List instead Set.
+	
+	
+	We can also use Map
+	
+	@ElementCollection
+	@MapKeyColumn(name = "nameType")
+	@CollectionTable(name = "nicknames", joinColumns = @JoinColumn(name = "stud_id"))
+	private Map<String, String> nickNames = new HashMap<String, String>();
+	
+	
+	Key column will be created name will be --> nameType i,e 
+	
+	Their will be 3 columns created inside nicknames table.
+	
+	
+	Student and Address Table:
+	-----------------------------
+	
+	Lets say that we want get address individually, persisted individually then we can go for entity.
+	
+	If we don't want create new table i,e add Address properties inside Student Table then we can go for @embeddable.
+	
+	Now, Address properties will be owned by Student Table only.
+	
+	
+	Below code what it does?
+	---------------------------
+	@Entity
+	public class Student {
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int student_id;
+
+	private String student_name;
+
+	private Long mobile_no;
+
+	private int age;
+	
+	@ElementCollection
+	@MapKeyColumn(name = "nameType")
+	@CollectionTable(name = "nicknames", joinColumns = @JoinColumn(name = "stud_id"))
+	private Map<String, String> nickNames = new HashMap<String, String>();
+
+
+	@ElementCollection
+	@CollectionTable(name = "stud_address", joinColumns = @JoinColumn(name = "stud_id"))
+	private List<Address> address  = new ArrayList<Address>();
+	
+}
+	
+	
+	Now, Address is embeddable type which means it doesn't have PK
+	
+	This line of code creates new table called stud_address with FK as stud_id and it will be having below columns 
+	addressLine1,city.
+	
+	Address.java
+	----------------
+	
+	
+	@Embeddable
+	public class Address { //value Type no PK
+	
+	private String addressLine1;
+	
+	private String city;
+
+	
+	public String getAddressLine1() {
+		return addressLine1;
+	}
+
+	public void setAddressLine1(String addressLine1) {
+		this.addressLine1 = addressLine1;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+}
+
+
+	@ElementCollection vs @OneToMany?
+	--------------------------------------
+	@OneToMany --> we will have a entity.
+	
+	@ElementCollection --> It is used in the case when all operation depends on parent only i,e 
+						Whenever we want to fetch we need to fetch, delete it should based on parent id.
+						We can't persist the data individually.
+						since they are embeddable type.
+						
+	
+	
+	
+	
+	

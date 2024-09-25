@@ -1,0 +1,11 @@
+
+	Steps to be followed for saving an object without using SpringBoot:
+	---------------------------------------------------------------------
+	
+	1) create maven project.
+	2) create an entity class example: Student.
+	3) annotate entity class with @entity i,e on order to achieve this
+		make sure add dependency from jakarta.persistence instead of hibernate core.
+	4) create an config class that scans the package, for this we need to add dependency
+		called springcontext.
+	5) 

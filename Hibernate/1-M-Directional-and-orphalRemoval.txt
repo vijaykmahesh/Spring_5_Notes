@@ -1,0 +1,166 @@
+
+	One-to-many Bi-Directional
+	----------------------------
+	
+	Make below changes in Customer.java
+	--------------------------------------
+	
+	@OneToMany(mappedBy = "customer")
+	private List<Order> orders;
+	
+	
+	Saving in One-to-many Bi-Directional
+	----------------------------------------
+	//Saving by using non owning entity
+	
+		Customer cust = new Customer();
+		cust.setCustomerName("sri");
+		cust.setMobileNo("90887654312");
+		
+		List<Order> orders = new ArrayList<Order>();
+		
+		Order order1 = new Order();
+		order1.setCost(90876.00);
+		order1.setItem_name("violin");
+		
+		//Manual
+		order1.setCustomer(cust); 
+		
+		// manually we have to set customer to order since we Customer is non owning or child entity.
+		// If we don't do this customer won't be set to that order then it will null i,e FK will be null
+		
+		Order order2 = new Order();
+		order2.setCost(50000.00);
+		order2.setItem_name("Band Set");
+		
+		//Manual
+		order2.setCustomer(cust);
+		
+		orders.add(order1);
+		orders.add(order2);
+		
+		cust.setOrders(orders);
+		
+		session.persist(cust);
+
+		session.getTransaction().commit();
+		
+		
+		update in One-to-many Bi-Directional
+		-----------------------------------------
+		//fetching customer id 7
+		Customer customer = session.get(Customer.class, 7);
+		
+		//fetching order id 3
+		Order order = session.get(Order.class, 3);
+		
+		// associating customer id 7 with order id 3  
+		order.setCustomer(customer);
+		
+	We can write utility method for associating in Customer Class
+	----------------------------------------------------------------
+	
+	public void addOrder(Order order) {
+		
+		if(orders == null) {
+			
+			orders = new ArrayList<Order>();
+		}
+		
+		order.setCustomer(this);
+		orders.add(order);
+	}
+	
+	If we don't have Bi-Directional mapping How can we fetch Orders related to particular Customer?
+	--------------------------------------------------------------------------------------------------
+	
+	List<Order> listOrders = session.createQuery("Select o from Order o where o.customer.customer_id =:customerId",Order.class)
+				.setParameter("customerId", 7)
+				.list();
+		
+		
+		listOrders.forEach(order -> System.out.println(order));
+		
+		
+		
+	Delete order then Customer should also be deleted:
+	-----------------------------------------------------
+	
+	// this line of code will work only if 1 order is associated with only 1 customer 
+	Order order = session.get(Order.class, 1);
+		
+	session.delete(order);
+	
+	If 1 customer is associated with 2 more orders we won't be able to achieve   
+	
+	session.delete(order);
+	
+	// we will getting exception called IntegrityViolationException.
+	
+	instead we have to first de-associate customer i,e without orphal
+	-----------------------------------------------------------------
+	order.setCustomer(null);
+	session.delete(order);
+	
+	
+	2nd option is by using orphalremoval = true in non owning side i,e Customer
+	-------------------------------------------------------------------------------
+	
+	@OneToMany(mappedBy = "customer",orphanRemoval = true)
+	private List<Order> orders;
+	
+	//fetching order
+	Order order = session.get(Order.class, 10);
+	//deleting order
+	session.delete(order);
+	
+	What this does is it deletes all the orders related to customer.
+	
+	2nd option is by mentioning CascadeType.ALL in both side i,e owning and non owning side.
+	
+	
+	FetchType:
+	------------
+	@onetomany --> by default it is lazy fetch.
+	----------------------------------------------
+	
+		Customer customer = session.get(Customer.class, 3); // only fetches customer details.But order details will be their in proxy and intialized will be false
+
+		System.out.println("customer 1 mobile is "+customer.getMobileNo());
+		
+		List<Order> orders = customer.getOrders();
+		
+		orders.forEach(order -> System.out.println(order.getItem_name() + "-----" +order.getCost()));
+		
+		// when we access any property of order entity then proxy object will fetch real object i,e  It fetches order details and intialized will be true.
+		// At that time only query will be fired to DB.
+		
+		
+	Another scenario:
+	------------------
+	
+		Customer customer = session.get(Customer.class, 3); // only fetches customer details.But order details will be their in proxy and intialized will be false
+
+		System.out.println("customer 1 mobile is "+customer.getMobileNo());
+		
+		session.close();
+		
+		//session is closed and proxy is not yet intialized and we are trying to access non intialized proxy i,e orders.
+		
+		System.out.println(customer.getOrders()); // Give exception called LazyIntializationException
+		
+		
+	@manytoone --> by default it is Eager fetch
+	------------------------------------------------
+	
+		Order order = session.get(Order.class, 3); // When order will be then its child i,e customer entity will also be loaded.
+		
+		System.out.println("Order 1  is "+order);
+		
+	@manytoone --> what if we make fetchType = lazy?
+	-----------------------------------------------------
+	
+	Only order will be fetched but its associated customer won't be fetched i,e customer will be in proxy object, whenever we fetch it then it loads real object.
+	
+	
+	

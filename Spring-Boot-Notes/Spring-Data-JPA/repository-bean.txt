@@ -1,0 +1,88 @@
+
+
+	JPARepository jpaRepository	 = container.getBean("jpaRepository",JPARepository.class);
+	
+	Will given exception y ?
+	----------------------------
+	It won't create an object of JPARepository,because it has a annotation called @NoRepositoryBean.
+	
+	All intermediate interface has @NoRepositoryBean y ?
+	-------------------------------------------------------
+	
+	If we write @NoRepositoryBean to our custom interface then we will get 
+	exception saying No Bean Available. If we try to achieve getBean("bookRepository").
+	
+	i,e 
+	
+	@NoRepositoryBean
+	public interface BookRepository extends JPARepository{
+	
+	
+	
+	}
+	
+	Y spring won't create an object for intermediate repository if it has @NoRepositoryBean annotation ?
+---------------------------------------------------------------------------------------------------------
+	
+	Example 1:
+	------------
+	
+	public interface BookRepository extends JPARepository{
+	
+	
+	
+	}
+
+	since their is no need of creating an object for JPARepository,ListCrudRepository etc... 
+	because for BookRepository interface its already created an impl object and we can use that object 
+	since that object(BookRepository) has all implementation methods of JPARepository,ListCrudRepository etc...
+	
+	
+	Example 2:
+	------------
+	
+	@NoRepositoryBean
+	public interface BookRepository extends JPARepository{
+	
+	List<Book> findByAuthor(String author);
+	
+	
+	}
+	public interface BookRepoChild extends BookRepository{
+	
+	
+	
+	}
+	
+	
+	//bookRepoChild.save(entity);
+	//bookRepoChild.findByAuthor("vijay");
+	
+	Now what is the use of creating object for BookRepository individually since we can directly 
+	use BookRepoChild and get all methods of BookRepository,JPARepository,ListCrudRepository etc...
+	so we can annotate BookRepository with @NoRepositoryBean.
+	
+	
+	Y @Repository annotation is not written inside interface i,e Ex: BookRepository ?
+	--------------------------------------------------------------------------------
+	
+	since spring automatically creating an impl object of BookRepository since it 
+	automatically scans the repository interface and since it is extending to Repository interface.
+	
+	If it was like below:
+	-------------------------
+	
+	interface BookDAO{
+	
+	findAll();
+	
+	}
+	
+	@Repository
+	class BookDAOImpl implements BookDAO {
+	
+	
+	}
+	
+	
+	Since we are creating an object of BookDAOImpl we should write @Repository annotation.

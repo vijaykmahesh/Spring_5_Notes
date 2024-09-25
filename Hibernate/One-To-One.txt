@@ -1,0 +1,116 @@
+
+	To establish relation between two entites
+	-------------------------------------------
+	@joincolumn() --> its a special annotation which tells us its a join column not a normal column.
+				It links to another entity 
+				
+				
+	@one-to-one ---> defines that it is a 1-1 relation.
+	
+	cascade = cascadeType.all --> It performs all operations i,e If we perform CRUD on parent entity child entity will be affected.
+	
+	If we save parent entity to DB its child entity will also be saved.
+	
+	Example Student and Passport: Uni-Directional
+	----------------------------------------------
+	
+		When we load student entity its child entity will also be loaded 
+		But if we load child entity its parent will not be loaded.
+		
+	
+		@Entity
+		@Table(name = "Student")
+		public class Student { // owning Table or source Table
+
+		@Id
+		@GeneratedValue(strategy = GenerationType.IDENTITY)
+		@Column(name = "student_id")
+		private int id;
+
+		@Column(name = "student_name")
+		private String name;
+
+		@Column(name = "student_country")
+		private String country;
+
+		@OneToOne
+		@JoinColumn(name = "passport_id") // creates a link between student and passport.
+		private Passport passport;
+
+		public int getId() {
+			return id;
+		}
+
+		public void setId(int id) {
+			this.id = id;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public String getCountry() {
+			return country;
+		}
+
+		public void setCountry(String country) {
+			this.country = country;
+		}
+
+		public Passport getPassport() {
+			return passport;
+		}
+
+		public void setPassport(Passport passport) {
+			this.passport = passport;
+		}
+
+	}
+	
+	Passport.java
+	--------------
+	
+	@Entity
+	@Table(name = "Passport")
+	public class Passport {
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "passport_id")
+	private int id;
+	
+	@Column(name = "passport_number")
+	private String passportNumber;
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getPassportNumber() {
+		return passportNumber;
+	}
+
+	public void setPassportNumber(String passportNumber) {
+		this.passportNumber = passportNumber;
+	}
+
+
+}
+
+		Student student = session.get(Student.class,7); // Student object and passport entity will also be loaded.
+		
+		Passport passport = session.get(Passport.class,1001); // since we are loading child entity its parent will not be loaded.
+			
+	
+	
+	
+	
+			

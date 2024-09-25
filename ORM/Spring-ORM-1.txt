@@ -1,0 +1,52 @@
+
+	DataSource internally manages connections.
+	
+	For each and every operation a new connection is opened.
+	Once request is served particular connection object is destroyed.
+	If we do 100 operations then 100 new connection object will be opened, so it is a drawback.
+	
+	We can overcome this by doing 1 connection object for 1 client, i,e how much ever operations he does their is no issue.
+	
+	Connection Pooling:
+	-----------------------
+	
+	Whenever we deploy application to tomcat server, DataSource object will be created which will create connection-pool
+	i,e a pool of connections object will be present.
+	
+	once we request any data directly application won't be hitting the database instead,
+	application asks the the connection pool, hey i need to connect to database, please give me a connection object.
+	then pool will get the connection object for connecting to the database.
+	
+	once we get the data then the particular connection object will be back to the pool.
+	
+	connection-pooling always happens in the server-end.
+	
+	DriverManagerDataSource doesn't create connection-pool instead for each and every operation 
+	it creates a new connection, and after serving data it destroys connection object, 
+	so We should not use DriverManagerDataSource.
+	
+	ComboPooledDataSource:
+	------------------------
+	
+	It uses connection-pooling concept.
+	
+	once we get the data then the particular connection object will be reused by another client.
+	
+	Internally pool size will be 3 i,e 3 connection object will be present inside pool.
+	
+	If we use 3 connections also then connection object will be incremented by property called acquireIncrement.
+	
+	When server startup we want 30 connection to setup then we can use below code:
+	-----------------------------------------------------------------------------------
+	pooledDataSource.setInitialPoolSize(30);
+	
+	We can the acquireIncrement property also using below code:
+	--------------------------------------------------------------
+	pooledDataSource.setAcquireIncrement(10);
+	
+	
+	
+	
+	
+	
+	

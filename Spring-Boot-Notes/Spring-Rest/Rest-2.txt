@@ -1,0 +1,44 @@
+
+	@RestController
+	------------------
+	@RestController internally as @Controller and @ResponseBody. i,e we don't have explicitly write @controller.
+	
+	The below code will not work without adding jackson jar into pom.xml
+	-----------------------------------------------------------------------
+	@GetMapping("/student")
+	public Student studentData() {
+
+		Student student = new Student(1, "vijay", "Ind");
+
+		return student;
+
+	}
+	We will be getting 406 exception saying mediaTypeNotAcceptable.
+	
+	since automatic conversion is done by jackson to convert Java Object to JSON.
+	
+	Once we add jackson jar it will resolved and in postman tool we should select media type as JSON.
+	
+	If we want get the data in xml format we should add jackson xml jar and in postman tool we should select media type as XML.
+	
+	
+	What if we want to restrict user to get only JSON but not XML? Write below
+	-----------------------------------------------------------------------------
+	
+	@GetMapping(value = "/student", produces = MediaType.APPLICATION_JSON_VALUE)
+	public Student studentData() {
+
+		BatchInfo batchInfo = new BatchInfo();
+		batchInfo.setBatchName("spring and hibernate");
+		batchInfo.setInstructorName("sigi");
+		
+		
+		Student student = new Student(1, "vijay", "Ind");
+		student.setBatchInfo(batchInfo);
+		
+		return student;
+
+	}
+	
+
+	

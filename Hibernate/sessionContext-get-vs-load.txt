@@ -1,0 +1,74 @@
+
+	2 ways to create session:
+	-----------------------------
+	1st way --> Session session = sessionFactory.openSession();
+	
+	2nd way --> Session session = sessionFactory.getCurrentSession();
+	
+	
+	whenever we use 1st way we should manually close the and flush the session. i,e session.close() we have to manully manage session.
+	
+	whenever we use 2nd way once the transaction is commited the session will be closed automatically i,e Hibernate will manage everything.
+	
+	add below property in cfg.xml file before using session.getCurrentSession()
+	
+	<property name="hibernate.current_session_context_class">thread</property> 
+	
+	Here thread means refering to ThreadLocalSessionContext Class.
+	
+	whenever we use getCurrentSession() through the application session object will be same i,e 
+	
+		Session session = sessionFactory.getCurrentSession();
+		Session session1 = sessionFactory.getCurrentSession();
+		
+		System.out.println(session1 == session); //true
+		
+		
+	Sessions are not thread safe.
+	
+	Each and every user uses a different Session i,e For 1 request 1 thread will be assigned and that thread will be responsible for 
+	committing the transaction.
+	
+	We need to make sure that for each and every request we need to maintain seperate Session.
+	
+		Session session2 = sessionFactory.openSession();
+		Session session3 = sessionFactory.openSession();
+		
+		System.out.println(session2 == session3); //false
+	
+	Each time it will create new session Object.
+
+	trans.commit(); // flush + commit i,e 
+	
+	session.flush(); == trans.commit();
+	
+	
+	Flushing means it will trigger the query, inserts the data but it won't commit the data into DB.
+	It sinks Persistant context with the DB.
+	
+	Make sure that u have to write trans.commit() mandatorily if we use session.flush().
+	
+	session.load()
+	--------------
+		Student student = session.load(Student.class, 1); //1 
+		System.out.println("printing student object"); //2
+		System.out.println(student); //3
+		
+		whenever we exceute above code line no 2 will be executed first since, session.load() is lazy loading. 
+		Line 1 gives us a proxy object.
+		whenever we access the object i,e line no 3 then we will get real object and proxy will be intialized.
+		That time only query will be fired.
+		
+		whenver we fetch the record which doesn't exist in the DB then we will be getting ObjectNotFoundException.
+	
+		
+	session.get()
+	---------------
+		Student student = session.get(Student.class, 1); //1
+		System.out.println("printing student object"); //2
+		System.out.println(student); //3
+		
+		session.get() is eager loading i,e at Line no 1 query will be fired..
+		Line 1 gives a real object.
+	
+		whenver we fetch the record which doesn't exist in the DB we will be NullPointerException.

@@ -1,0 +1,44 @@
+
+	In case of JPA we need not write query instead spring will write the query by parsing 
+	the methods i,e.
+	
+	Example: Employee findByName(String name);
+	
+	
+	when above method is executed then springboot is parsing the above method like 
+	
+	find(keyword) ==> select
+	By(keyword) ==> where 
+	Name ==> It is property which is present in Entity class.
+	
+	Can we write whatever we want ? no we can't write since springboot can't understand it i,e 
+	
+	Employee hello(); // we will be getting error since springboot can't parse the method.
+	
+	Link:
+	https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#repository-query-keywords
+	
+	
+	But if we don't want springboot to parse the method and 
+	generate query then we can use below way:
+	
+	
+	a) @Query(value="Select * from employees where name=:name",nativeQuery=true)
+	   Employee hello(String name);
+	
+	The above query is Native query i,e 
+	
+	employees ==> tableName
+	employee_name ==> fieldName in Table
+	
+	b) @Query(value="FROM Employee where name=:name")  // by default nativeQuery is false
+	   Employee hello(String name);
+	   
+	   
+	
+	The above query is JPQL query i,e 
+	
+	Employee ==> EntityName
+	name ==> propertyName in Entity.
+	
+	

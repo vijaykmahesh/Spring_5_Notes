@@ -1,0 +1,139 @@
+	Spring JDBC vs Spring JPA
+	-----------------------------
+	In Spring JDBC we have create table.
+	In Spring JDBC Queries should be explicitly written.
+	
+
+	JPA is specification or rules provided so that vendors will follow.
+	
+	JPA Vendors:
+	---------------
+	Hibernate
+	My Batis etc...
+	
+	Frequently used in industry is Hibernate.
+	
+	
+	DataSource:
+	---------------
+	DataSource is basically used for manage connections.
+	
+	In application.properties mention below:
+	------------------------------------------
+	ddl.auto=create
+	
+	what the above line says is 
+	-------------------------------
+	
+	After creating EntityManagerFactory object,then that object will detect the class 
+	which is annotated with @Entity, then spring will create table in the database.
+	
+	
+	EntityManagerFactory(In JPA) --> SessionFactory(In Hibernate)
+	EntityManager(In JPA)  --> Session(In Hibernate)
+	
+	EntityManager(I):
+	------------------
+	EntityManager object will be created with the help of EntityManagerFactory.
+	
+	2 types of EntityManagerFactory:
+	------------------------------------
+	a) LocalEntityManagerFactory
+	b) LocalContainerEntityManagerFactoryBean.
+	
+	Since we are using Spring its container based so it creates 
+	LocalContainerEntityManagerFactoryBean internally,which provides the 
+	implementation for EntityManager.
+	
+	1) EntityManager is nothing but the persistence context.
+	
+	EntityManager is wrapper of session.
+	
+	proof?
+	----------
+	// unwrapping the session object from entityManager
+	// below line behind scene creates LocalContainerEntityManagerFactoryBean object.
+	
+	Session sessionUnwrapping = entityManager.unwrap(Session.class);
+	
+	//after this we can perform save operation using session object i,e it will be 
+	// hibernate specific.
+	
+	
+	@Transaction annotation should only be used in case of Create,Update and Delete operation.
+-----------------------------------------------------------------------------------------------
+		
+		Student s = new Student(); ==> transient state
+		
+		entityManager.persist(s); ==> persistence state since its managed by entityManager.
+		
+	For Update Scenario:
+	-------------------------
+	
+	Scenario1:
+	--------------
+	
+		Student student = new Student();
+
+		student.setStudentName("nandan");
+		student.setMobile(777777);
+		student.setAddr("odisha");
+		
+		entityManager.persist(s);
+		
+		//after execution of persist(), what ever changes we make to object 
+		//it will be tracked by persistence context,so object it will be updated.
+		
+		student.setStudentName("nandan p");
+	
+	
+	entityManager.merge():
+	---------------------------
+	save() and merge() both save the object into DB.
+	
+	Difference will be discussed later.
+	
+	But if we run below code:
+	----------------------------
+	Scenario 1:
+	---------------
+		Student student = new Student();
+		
+		student.setId(6);
+		student.setName("kantha");
+		student.setAddress("amd");
+		student.setMobile(712345678);
+		
+		entityManager.merge(student);
+		
+		//after execution of merge(), what ever changes we make to object 
+		//it will be not tracked by persistence context.
+		
+		//object will not be updated.
+		student.setName("kantha s");
+		
+	Scenario 2:
+	---------------
+		Student student = new Student();
+		
+		student.setId(6);
+		student.setName("kantha");
+		student.setAddress("amd");
+		student.setMobile(712345678);
+		
+		Student ret = entityManager.merge(student);
+		
+		// here student and ret is different object.
+		// note that we should always use merge() returned object for updation of entity.
+		
+		ret.setName("kantha s"); // now db will be updated to "kantha s".
+		
+		proof:
+		-----------
+		System.out.println(">>>>>>>>>>>"+student.hashCode()); 
+		System.out.println(">>>>>>>>>>>"+ret.hashCode());
+
+	
+		
+	
+	
